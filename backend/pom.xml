@@ -28,8 +28,30 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<searchPath>classpath*:db/changelog</searchPath>
+		<changeLogMasterFile>db.changelog-master.yaml</changeLogMasterFile>
+		<diffChangeLogFile>WILL-BE-CHANGED-IN-MAKE-FILE</diffChangeLogFile>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,6 +91,39 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>4.30.0</version>
+				<configuration>
+					<diffChangeLogFile>${diffChangeLogFile}</diffChangeLogFile>
+					<changeLogFile>${changeLogMasterFile}</changeLogFile>
+					<searchPath>${searchPath}</searchPath>
+					<driver>org.postgresql.Driver</driver>
+					<referenceUrl>hibernate:spring:ch.reidyt.hivebalance?dialect=org.hibernate.dialect.PostgreSQLDialect</referenceUrl>
+					<url>${env.LIQUIBASE_COMMAND_URL} </url>
+					<username>${env.POSTGRES_USER} </username>
+					<password>${env.POSTGRES_PASSWORD} </password>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate6</artifactId>
+						<version>4.30.0</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-data-jpa</artifactId>
+						<version>${project.parent.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>jakarta.validation</groupId>
+						<artifactId>jakarta.validation-api</artifactId>
+						<version>3.1.0</version>
+					</dependency>
+				</dependencies>
+				</plugin>
 		</plugins>
 	</build>
 
