@@ -46,7 +46,7 @@ This "application-first" approach allows you to focus on your code, while Liquib
 > The order of entries in `db.changelog-master.yaml` is crucial. Migrations are executed in the order they appear in this file.
 
 > [!WARNING]
-> If you generate a migration before applying a previously generated one, you'll create duplicate migration files with the same changes. Always apply pending migrations before creating new ones.
+> If you generate a migration before applying a previously generated one, you'll create duplicate migration files with the same changes. Always apply pending migrations before creating new ones. If you are using the `make generateMigration` command, the migration file won't be generated if there is any pending migration.
 
 
 ### Applying Migrations
