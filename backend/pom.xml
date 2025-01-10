@@ -102,7 +102,7 @@
 					<searchPath>${searchPath}</searchPath>
 					<driver>org.postgresql.Driver</driver>
 					<referenceUrl>hibernate:spring:ch.reidyt.hivebalance?dialect=org.hibernate.dialect.PostgreSQLDialect</referenceUrl>
-					<url>${env.LIQUIBASE_COMMAND_URL} </url>
+					<url>jdbc:postgresql://${env.POSTGRES_HOST}:${env.POSTGRES_PORT}/${env.POSTGRES_USER}</url>
 					<username>${env.POSTGRES_USER} </username>
 					<password>${env.POSTGRES_PASSWORD} </password>
 				</configuration>

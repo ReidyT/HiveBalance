@@ -2,7 +2,7 @@
 
 You can run the Spring backend using the `Spring Boot Dashboard` or using the maven command `./mvnw spring-boot:run`.
 
-> [!INFO]
+> [!NOTE]
 > If a new migration file isn't applied after restarting the backend via the `Spring Boot Dashboard`, try running `./mvnw spring-boot:run` or rebuilding the application.
 
 ## Environment Variables
@@ -80,7 +80,7 @@ The Liquibase Maven plugin is configured in the project's `pom.xml`:
         <changeLogFile>...</changeLogFile>
         <driver>...</driver>
         <referenceUrl>...</referenceUrl>
-        <url>${env.LIQUIBASE_COMMAND_URL}</url>
+        <url>...</url>
         <username>${env.POSTGRES_USER}</username>
         <password>${env.POSTGRES_PASSWORD}</password>
     </configuration>
