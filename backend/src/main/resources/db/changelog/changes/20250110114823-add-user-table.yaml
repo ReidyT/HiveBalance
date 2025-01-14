@@ -21,11 +21,26 @@ databaseChangeLog:
             constraints:
               nullable: false
             name: password
-            type: VARCHAR(30)
+            type: VARCHAR(60)
         - column:
             constraints:
               nullable: false
             name: username
             type: VARCHAR(15)
-        tableName: User
-
+        tableName: bee_user
+- changeSet:
+    id: 1736509718215-2
+    author: ReidyT
+    changes:
+    - addUniqueConstraint:
+        columnNames: email
+        constraintName: UC_BEE_USER_EMAIL
+        tableName: bee_user
+- changeSet:
+    id: 1736509718215-3
+    author: ReidyT
+    changes:
+    - addUniqueConstraint:
+        columnNames: username
+        constraintName: UC_BEE_USER_USERNAME
+        tableName: bee_user

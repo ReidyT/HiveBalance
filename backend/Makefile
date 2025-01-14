@@ -17,7 +17,7 @@ runMigrations:
 	mvn liquibase:update -DsearchPath=${RESOURCES_DIRECTORY} -DchangeLogMasterFile=${MIGRATION_MASTER_FILE_RELATIVE}
 
 check_migrations_status = mvn clean compile; \
-	$(eval MIGRATION_STATUS := $(shell mvn liquibase:status -DsearchPath=${RESOURCES_DIRECTORY} -DchangeLogMasterFile=${MIGRATION_MASTER_FILE_RELATIVE} | tee /dev/tty | grep -c -i "has not been applied" | tr -d '\n')) \
+	$(eval MIGRATION_STATUS := $(shell mvn liquibase:status -DsearchPath=${RESOURCES_DIRECTORY} -DchangeLogMasterFile=${MIGRATION_MASTER_FILE_RELATIVE} | tee /dev/tty | grep -c -i -E "(has|have) not been applied" | tr -d '\n')) \
     $(if $(filter-out 0,$(MIGRATION_STATUS)), \
     	echo "\033[38;5;208m[WARNING] Pending migrations exist. Apply them before generating a new migration.\033[0m", \
         echo "[SUCCESS] The database is up to date. You can generate new migration files if needed.")

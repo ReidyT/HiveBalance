@@ -25,6 +25,12 @@ These variables are set in the .env.development file and imported in the dev con
 
 This project uses Liquibase to manage database schema changes.  Liquibase allows us to evolve the database schema in a controlled and versioned manner, keeping it synchronized with the application code.
 
+By default, Liquibase will run on Spring Boot's start. If you want to manage migrations manually, set the following property in `application.properties`:
+
+```properties
+spring.liquibase.enabled=false
+```
+
 ### Generating Migration Files
 
 Migrations are generated automatically from your JPA entities, simplifying the process of database schema evolution.  To create a new migration file, use the following command:
@@ -77,9 +83,9 @@ The Liquibase Maven plugin is configured in the project's `pom.xml`:
     <artifactId>liquibase-maven-plugin</artifactId>
     <version>...</version>
     <configuration>
+        <propertyFile>liquibase.properties</propertyFile>
         <changeLogFile>...</changeLogFile>
         <driver>...</driver>
-        <referenceUrl>...</referenceUrl>
         <url>...</url>
         <username>${env.POSTGRES_USER}</username>
         <password>${env.POSTGRES_PASSWORD}</password>
@@ -97,8 +103,12 @@ The Liquibase Maven plugin is configured in the project's `pom.xml`:
 
 #### Key Configuration Elements:
 
-- changeLogFile: Specifies the master changelog file.
-- driver: The PostgreSQL JDBC driver.
-- referenceUrl: Used for Hibernate integration. Make sure this matches your project's package.
-- url, username, password: Database connection details, drawn from environment variables.
-- liquibase-hibernate6 dependency: Ensures compatibility with Hibernate 6.
+- **propertyFile**: Specifies the liquibase property file to use.
+    - It contains only the **referenceUrl** key.
+    - Need to be in properties file because Maven didn't like the **physical_naming_strategy** and **implicit_naming_strategy**.
+    - **referenceUrl**: Used for Hibernate integration. Make sure this matches your project's package.
+    - **implicit_naming_strategy** and **implicit_naming_strategy**: Ensure the generated migrations will use the same table names as Hibernate (snake_case). Without these properties, the naming style used by liquibase is PascalCase.
+- **changeLogFile**: Specifies the master changelog file.
+- **driver**: The PostgreSQL JDBC driver.
+- **url**, **username**, **password**: Database connection details, drawn from environment variables.
+- **liquibase-hibernate6** dependency: Ensures compatibility with Hibernate 6.
