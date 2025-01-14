@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HivebalanceApplication {
+public class HiveBalanceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HivebalanceApplication.class, args);
+		SpringApplication.run(HiveBalanceApplication.class, args);
 	}
 
 }
