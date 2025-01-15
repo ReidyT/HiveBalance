@@ -1,5 +1,9 @@
 FROM mcr.microsoft.com/devcontainers/java:1-21-bullseye
 
+ARG USERNAME=spring
+ARG USER_UID=1010
+ARG USER_GID=$USER_UID
+
 ARG INSTALL_MAVEN="true"
 ARG MAVEN_VERSION=""
 
@@ -15,3 +19,10 @@ RUN if [ "${INSTALL_MAVEN}" = "true" ]; then su vscode -c "umask 0002 && . /usr/
 
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
