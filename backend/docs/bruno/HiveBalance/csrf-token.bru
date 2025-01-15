@@ -1,0 +1,23 @@
+meta {
+  name: csrf-token
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{BACKEND_URL}}/csrf/token
+  body: none
+  auth: none
+}
+
+tests {
+  // Tests (run after the request):
+  test("Update CSRF Token", function () {
+      const jsonData = res.getBody();
+      const csrfToken = jsonData.token;
+      const CSRF_TOKEN_KEY = "CSRF_TOKEN";
+  
+      bru.setVar(CSRF_TOKEN_KEY, csrfToken);
+      expect(bru.getVar(CSRF_TOKEN_KEY)).to.equal(csrfToken);
+  });
+}

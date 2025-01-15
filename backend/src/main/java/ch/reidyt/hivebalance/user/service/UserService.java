@@ -1,8 +1,12 @@
 package ch.reidyt.hivebalance.user.service;
 
+import java.util.Optional;
+
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import ch.reidyt.hivebalance.user.dto.UserLoginDTO;
 import ch.reidyt.hivebalance.user.dto.UserRegistrationDTO;
 import ch.reidyt.hivebalance.user.model.BeeUser;
 import ch.reidyt.hivebalance.user.repository.UserRepository;
@@ -17,5 +21,15 @@ public class UserService {
 
     public BeeUser createUser(UserRegistrationDTO userRegistrationDTO) {
         return userRepository.save(userRegistrationDTO.toUser(passwordEncoder));
+    }
+
+    public BeeUser login(UserLoginDTO userLoginDTO) {
+        Optional<BeeUser> user = userRepository.findByLoginIdentifier(userLoginDTO.getLoginIdentifier());
+
+        if (!user.isPresent() || !passwordEncoder.matches(userLoginDTO.getPassword(), user.get().getPassword())) {
+            throw new UsernameNotFoundException("Given credentials are not valid!");
+        }
+
+        return user.get();
     }
 }

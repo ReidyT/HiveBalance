@@ -1,0 +1,23 @@
+meta {
+  name: register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BACKEND_URL}}/register
+  body: json
+  auth: none
+}
+
+headers {
+  X-CSRF-TOKEN: {{CSRF_TOKEN}}
+}
+
+body:json {
+  {
+      "email": "user2@demo.ch",
+      "username": "user2",
+      "password": "astrongpassword"
+  }
+}

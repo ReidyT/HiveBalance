@@ -24,8 +24,8 @@ public class SpringSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return (username) -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
+        return (username) -> userRepository.findByLoginIdentifier(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Login '" + username + "' not found"));
     }
 
     @Bean
@@ -34,9 +34,12 @@ public class SpringSecurityConfig {
                 .csrf(Customizer.withDefaults())
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(HttpMethod.GET, "/checks/auth").authenticated()
                         .requestMatchers(HttpMethod.POST, "/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/checks/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/checks/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/csrf/token").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/health-check").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
                 .build();

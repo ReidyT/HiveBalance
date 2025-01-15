@@ -1,0 +1,15 @@
+meta {
+  name: csrf-check
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BACKEND_URL}}/checks/csrf
+  body: none
+  auth: none
+}
+
+headers {
+  X-CSRF-TOKEN: {{CSRF_TOKEN}}
+}

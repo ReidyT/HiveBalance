@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.reidyt.hivebalance.user.dto.UserDTO;
+import ch.reidyt.hivebalance.user.dto.UserLoginDTO;
 import ch.reidyt.hivebalance.user.dto.UserRegistrationDTO;
 import ch.reidyt.hivebalance.user.model.BeeUser;
 import ch.reidyt.hivebalance.user.service.UserService;
@@ -35,13 +36,28 @@ public class UserController {
             HttpServletRequest request,
             HttpServletResponse response) {
         BeeUser beeUser = userService.createUser(userRegistrationDTO);
-        UserDTO userDTO = new UserDTO(beeUser.getId(), beeUser.getEmail(), beeUser.getUsername());
+        UserDTO userDTO = UserDTO.fromEntity(beeUser);
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(userDTO, null, Collections.emptyList()));
         securityContextRepository.saveContext(context, request, response);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> login(@Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        BeeUser beeUser = userService.login(userLoginDTO);
+        UserDTO userDTO = UserDTO.fromEntity(beeUser);
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(userDTO,
+                null, Collections.emptyList()));
+        securityContextRepository.saveContext(context, request, response);
+
+        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
     }
 
     @PostMapping("/signOut")
