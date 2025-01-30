@@ -5,7 +5,17 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached"
+	],
+	"postCreateCommand": {
+		"configure-workspaces": "sudo chown -R $(whoami):$(whoami) /workspaces/${localWorkspaceFolderBasename}",
+		"configure-maven": "chmod +x mvnw"
+	},
+	"remoteUser": "spring",
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -20,45 +30,39 @@
 						"username": "postgres",
 						"password": "postgres",
 						"group": "hivebalance"
-					},
-					{
-						"previewLimit": 50,
-						"server": "db-test",
-						"port": 5432,
-						"name": "test",
-						"driver": "PostgreSQL",
-						"database": "test",
-						"username": "test",
-						"password": "test",
-						"group": "hivebalance"
 					}
-				]
+				],
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash"
+					}
+				}
 			},
-		  	// Add the IDs of extensions you want installed when the container is created.
-		  	"extensions": [
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
 				"vscjava.vscode-java-pack",
 				"vmware.vscode-boot-dev-pack",
 				"mtxr.sqltools",
-        		"mtxr.sqltools-driver-pg",
+				"mtxr.sqltools-driver-pg",
 				"ms-azuretools.vscode-docker",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"gruntfuggly.todo-tree",
+				"wayou.vscode-todo-highlight",
+				"mutantdino.resourcemonitor"
 			]
 		}
-	}
-
+	},
+	"forwardPorts": [5432]
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {}
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
 	// "forwardPorts": [5432],
-
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "java -version",
-
 	// Configure tool-specific properties.
 	// "customizations": {},
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }

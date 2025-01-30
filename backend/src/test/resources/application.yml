@@ -1,0 +1,42 @@
+# Application configuration file used in the tests.
+spring:
+  application:
+    name: hivebalance
+    #  datasource:
+    #    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    #    username: ${POSTGRES_USER}
+    #    password: ${POSTGRES_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: true
+    changeLog: classpath:/db/db.changelog-master.yaml
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+        orm:
+          jdbc:
+            bind: TRACE
+      springframework:
+        security: DEBUG
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        # enable on prod.
+        secure: false
+security:
+  jwt:
+    # must be at least 256 bits
+    key: 9faa372517ac1d389758d3750fc07acf00f542277f26fec1ce4593e93f64e338
+    expiration: 86400000 # 1 day in ms
+    refreshTokenExpiration: 2592000000 # 30 days in ms

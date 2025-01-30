@@ -1,0 +1,10 @@
+-- liquibase formatted sql
+
+-- changeset ReidyT:1737472528730-1
+CREATE TABLE bee_user (id UUID NOT NULL, email VARCHAR(30) NOT NULL, password VARCHAR(60) NOT NULL, username VARCHAR(15) NOT NULL, CONSTRAINT "bee_userPK" PRIMARY KEY (id));
+
+-- changeset ReidyT:1737472528730-2
+ALTER TABLE bee_user ADD CONSTRAINT UC_BEE_USEREMAIL_COL UNIQUE (email);
+
+-- changeset ReidyT:1737472528730-3
+ALTER TABLE bee_user ADD CONSTRAINT UC_BEE_USERUSERNAME_COL UNIQUE (username);

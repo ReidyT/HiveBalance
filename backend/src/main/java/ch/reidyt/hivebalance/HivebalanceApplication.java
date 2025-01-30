@@ -2,12 +2,14 @@ package ch.reidyt.hivebalance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class HivebalanceApplication {
+@EnableScheduling
+public class HiveBalanceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HivebalanceApplication.class, args);
+		SpringApplication.run(HiveBalanceApplication.class, args);
 	}
 
 }

@@ -1,58 +1,50 @@
-version: '3.8'
+networks:
+  devcontainer-network:
+    name: hivebalance-network
 
 volumes:
   postgres-data:
-  postgres-data-test:
+  m2-cache:
+
 
 services:
   app:
     container_name: hivebalance-backend
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
+      args:
+        USER_UID: 1010
+        USER_GID: 1010
     env_file:
       - ../.env.development
     volumes:
       - ../..:/workspaces:cached
-      
+      # Maven cache
+      - m2-cache:/home/${USERNAME}/.m2
+    ports:
+      - "8085:8080"
+    networks:
+      - devcontainer-network
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
-
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
-
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # Use "forwardPorts" in **devcontainer.tmp.json** to forward an app port locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
     container_name: postgresdb
-    image: postgres:latest
+    image: postgres:17.2
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
     env_file:
       - ../.env.development
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
-
-  db-test:
-    container_name: postgresdb-test
-    image: postgres:latest
-    restart: unless-stopped
-    volumes:
-      - postgres-data-test:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: test
-      POSTGRES_USER: test
-      POSTGRES_DB: test
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
+    networks:
+      - devcontainer-network

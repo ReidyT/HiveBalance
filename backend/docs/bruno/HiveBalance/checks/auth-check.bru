@@ -1,0 +1,15 @@
+meta {
+  name: auth-check
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{BACKEND_URL}}/checks/auth
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
