@@ -1,0 +1,32 @@
+meta {
+  name: refreshToken
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BACKEND_URL}}/auth/refresh-token
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{REFRESH_TOKEN}}
+}
+
+tests {
+  // Tests (run after the request):
+  test("Update CSRF Token", function () {
+      const jsonData = res.getBody();
+      const accessToken = jsonData.access_token;
+      const refreshToken = jsonData.refresh_token;
+      const ACCESS_TOKEN_KEY = "ACCESS_TOKEN";
+      const REFRESH_TOKEN_KEY = "REFRESH_TOKEN";
+  
+      bru.setVar(ACCESS_TOKEN_KEY, accessToken);
+      expect(bru.getVar(ACCESS_TOKEN_KEY)).to.equal(accessToken);
+    
+      bru.setVar(REFRESH_TOKEN_KEY, refreshToken);
+      expect(bru.getVar(REFRESH_TOKEN_KEY)).to.equal(refreshToken);
+  });
+}
