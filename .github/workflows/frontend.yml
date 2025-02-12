@@ -1,0 +1,46 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Angular CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    # Optionally restrict to only PRs modifying this directory
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        # See angular support at https://angular.dev/reference/versions
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive #Important for mono-repos!  Ensure submodules are also checked out
+        fetch-depth: 0 #Needed to get all commit history for gitflow checks
+    - name: Use Node.js ${{ matrix.node-version }}
+      working-directory: ./frontend
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    - name: Build
+      working-directory: ./frontend
+      run: npm run build --if-present
+    - name: Run tests
+      working-directory: ./frontend
+      run: npm test:ci
