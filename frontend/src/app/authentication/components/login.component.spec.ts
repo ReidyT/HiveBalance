@@ -52,5 +52,4 @@ describe('LoginComponent', () => {
     fireEvent.click(loginButton);
     expect(authServiceSpy.login).toHaveBeenCalledOnceWith(mockUser);
   });
-
 });

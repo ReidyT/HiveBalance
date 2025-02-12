@@ -20,7 +20,7 @@ import {RouterLink} from '@angular/router';
   selector: 'app-registration',
   imports: [InputTextModule, ReactiveFormsModule, ButtonModule, StackComponent, FloatLabel, Password, PasswordHelperComponent, FluidModule, Card, CardContainerComponent, RouterLink],
   template: `
-    <app-card-container>
+    <app-card-container data-testid="registration-card">
       <p-card class="w-20rem md:w-30rem">
         <ng-template #header>
           <img alt="HiveBalance Logo" class="w-full md:h-20rem" src="/assets/hive_balance_logo.svg" height="200px"/>
@@ -49,7 +49,7 @@ import {RouterLink} from '@angular/router';
               <app-stack [gap]="3" direction="column">
                 <p-floatlabel variant="in" style="flex: 1">
                   <p-password [toggleMask]="true" formControlName="password" id="password" inputId="password"
-                              [strongRegex]="STRONG_PASSWORD_REGEX" fluid [attr.data-testid]="'registration-password'">
+                              [strongRegex]="STRONG_PASSWORD_REGEX" fluid data-testid="registration-password">
                     <ng-template #footer>
                       <app-password-helper
                         [password]="this.registrationForm.controls.passwords.controls.password.value ?? ''"/>
@@ -61,7 +61,7 @@ import {RouterLink} from '@angular/router';
                   <p-floatlabel variant="in">
                     <p-password [toggleMask]="true" formControlName="confirmPassword" id="confirmPassword"
                                 inputId="confirmPassword" feedback="false" fluid
-                                [attr.data-testid]="'registration-confirm'"
+                                data-testid="registration-confirm"
                                 [class]="formErrors.confirmPassword() ? 'ng-dirty ng-invalid' : ''"
                     />
                     <label for="confirmPassword">Confirm Password</label>
@@ -72,12 +72,11 @@ import {RouterLink} from '@angular/router';
                 </app-stack>
               </app-stack>
             </form>
-            <p-button [attr.data-testid]="'registration-button'"
-                      [disabled]="registrationForm.invalid"
+            <p-button [disabled]="registrationForm.invalid"
                       type="submit"
                       class="w-full"
                       styleClass="w-full">
-              Continue
+              Sign up
             </p-button>
           </app-stack>
         </form>

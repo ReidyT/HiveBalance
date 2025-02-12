@@ -7,7 +7,6 @@ import {FloatLabel} from 'primeng/floatlabel';
 import {InputText} from 'primeng/inputtext';
 import {Password} from 'primeng/password';
 import {StackComponent} from '../../shared/components/stack.component';
-import {STRONG_PASSWORD_REGEX} from '../consts/password.const';
 import {CardContainerComponent} from '../../shared/components/card-container.component';
 import {RouterLink} from '@angular/router';
 
@@ -25,13 +24,14 @@ import {RouterLink} from '@angular/router';
     RouterLink
   ],
   template: `
-    <app-card-container>
+    <app-card-container data-testid="login-card">
       <p-card class="w-20rem md:w-30rem">
         <ng-template #header>
           <img alt="HiveBalance Logo" class="w-full md:h-20rem" src="/assets/hive_balance_logo.svg" height="200px"/>
         </ng-template>
         <ng-template #title>Welcome back !</ng-template>
-        <ng-template #subtitle>Don't have an account? <a routerLink="/signUp">Sign Up</a></ng-template>
+        <ng-template #subtitle>Don't have an account? <a routerLink="/signUp">Sign Up</a>
+        </ng-template>
         <form [formGroup]="loginForm" (submit)="login()">
           <app-stack [gap]="3">
             <p-floatlabel variant="in">
@@ -42,12 +42,11 @@ import {RouterLink} from '@angular/router';
             <p-floatlabel variant="in" style="flex: 1">
               <p-password [toggleMask]="true" [feedback]="false" formControlName="password" id="password"
                           inputId="password" fluid
-                          [attr.data-testid]="'login-password'">
+                          data-testid="login-password">
               </p-password>
               <label for="password">Password</label>
             </p-floatlabel>
-            <p-button [attr.data-testid]="'login-button'"
-                      [disabled]="loginForm.invalid"
+            <p-button [disabled]="loginForm.invalid"
                       type="submit"
                       class="w-full"
                       styleClass="w-full">
