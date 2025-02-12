@@ -11,32 +11,32 @@ import {Divider} from 'primeng/divider';
     <p-divider/>
     <ul class="pl-2 ml-2 my-0 leading-normal" style="list-style-type: none; padding: 0; margin: 0;">
       <li><i
-        [attr.data-testid]="'helper-lowercase'"
+        data-testid="helper-lowercase"
         [class]="icons().lowerCase.icon"
         [style]="icons().lowerCase.color"></i> At least one lowercase
       </li>
       <li><i
-        [attr.data-testid]="'helper-uppercase'"
+        data-testid="helper-uppercase"
         [class]="icons().upperCase.icon"
         [style]="icons().upperCase.color"></i> At least one uppercase
       </li>
       <li><i
-        [attr.data-testid]="'helper-numeric'"
+        data-testid="helper-numeric"
         [class]="icons().numeric.icon"
         [style]="icons().numeric.color"></i> At least one numeric
       </li>
       <li><i
-        [attr.data-testid]="'helper-special'"
+        data-testid="helper-special"
         [class]="icons().specialChar.icon"
         [style]="icons().specialChar.color"></i> At least one special char
       </li>
       <li><i
-        [attr.data-testid]="'helper-min'"
+        data-testid="helper-min"
         [class]="icons().minLength.icon"
         [style]="icons().minLength.color"></i> Minimum 8 characters
       </li>
       <li><i
-        [attr.data-testid]="'helper-max'"
+        data-testid="helper-max"
         [class]="icons().maxLength.icon"
         [style]="icons().maxLength.color"></i> Maximum 30 characters
       </li>

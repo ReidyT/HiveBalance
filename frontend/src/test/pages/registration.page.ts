@@ -18,7 +18,7 @@ export class RegistrationPage {
   private readonly inputElementMapper: { [key in keyof RegistrationForm]: HTMLInputElement };
 
   constructor(screen: import("@testing-library/dom").Screen) {
-    this.registrationButton = screen.getByRole<HTMLButtonElement>('button', {name: 'Continue'});
+    this.registrationButton = screen.getByRole<HTMLButtonElement>('button', {name: /sign up/i});
     this.emailInput = screen.getByRole('textbox', {name: /email/i});
     this.usernameInput = screen.getByRole('textbox', {name: /username/i});
     this.passwordInputWrapper = screen.getByTestId('registration-password');
