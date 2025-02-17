@@ -6,15 +6,25 @@ import {render, screen, fireEvent} from '@testing-library/angular';
 import {TestBed} from '@angular/core/testing';
 import {RegistrationPage} from '../../../test/pages/registration.page';
 import {INPUT_COMMANDS} from '../../../test/utils/input.utils';
+import {of} from 'rxjs';
 
 
 describe('RegistrationComponent', () => {
 
   beforeEach(async () => {
+    const authServiceMock = jasmine.createSpyObj<AuthenticationService>(
+      'AuthenticationService',
+      ['registerWithRedirect']
+    );
+
+    // Configure the mock to return an Observable<boolean> with the value 'true'
+    authServiceMock.registerWithRedirect.and.returnValue(of(true));
+
     await render(RegistrationComponent, {
-      providers: [
-        {provide: AuthenticationService, useValue: jasmine.createSpyObj('AuthenticationService', ['register'])}
-      ],
+      providers: [{
+        provide: AuthenticationService,
+        useValue: authServiceMock,
+      }],
     })
   });
 
@@ -37,7 +47,7 @@ describe('RegistrationComponent', () => {
       // Because not all fields are filled, the button should be disabled.
       expect(page.registrationButton.disabled).toBeTruthy();
       fireEvent.click(page.registrationButton);
-      expect(authServiceSpy.register).not.toHaveBeenCalled();
+      expect(authServiceSpy.registerWithRedirect).not.toHaveBeenCalled();
     }
 
     // Fill the missing password confirmation field.
@@ -48,7 +58,7 @@ describe('RegistrationComponent', () => {
 
     // The authentication service should receive the correct data.
     fireEvent.click(page.registrationButton);
-    expect(authServiceSpy.register).toHaveBeenCalledOnceWith(mockUser);
+    expect(authServiceSpy.registerWithRedirect).toHaveBeenCalledOnceWith(mockUser);
   });
 
   [
@@ -164,7 +174,7 @@ describe('RegistrationComponent', () => {
       expect(page.fieldIsInValid(field)).toBeTruthy();
       expect(screen.getByText(error).textContent).toBe(error);
       fireEvent.click(page.registrationButton);
-      expect(authServiceSpy.register).not.toHaveBeenCalled();
+      expect(authServiceSpy.registerWithRedirect).not.toHaveBeenCalled();
     });
   });
 
@@ -217,7 +227,7 @@ describe('RegistrationComponent', () => {
 
           // The authentication service should not be called.
           fireEvent.click(page.registrationButton);
-          expect(authServiceSpy.register).not.toHaveBeenCalled();
+          expect(authServiceSpy.registerWithRedirect).not.toHaveBeenCalled();
         });
       });
     });
@@ -246,7 +256,7 @@ describe('RegistrationComponent', () => {
 
         // The authentication service should not be called.
         fireEvent.click(page.registrationButton);
-        expect(authServiceSpy.register).not.toHaveBeenCalled();
+        expect(authServiceSpy.registerWithRedirect).not.toHaveBeenCalled();
       });
     });
   });
@@ -284,9 +294,7 @@ describe('RegistrationComponent', () => {
     await page.clearForm("confirmPassword");
     await page.fillForm({confirmPassword: mockUser.password});
     expect(page.registrationButton.disabled).toBeFalsy();
-    // The authentication service should receive the correct data.
-    fireEvent.click(page.registrationButton);
-    expect(authServiceSpy.register).toHaveBeenCalledOnceWith(mockUser);
+    // Do not call the register function here because the button will be disabled until the redirection...
 
     // Changing password should invalidate the confirmation password.
     await page.clearForm("password");
@@ -301,6 +309,6 @@ describe('RegistrationComponent', () => {
     expect(page.registrationButton.disabled).toBeFalsy();
     // The authentication service should receive the correct data.
     fireEvent.click(page.registrationButton);
-    expect(authServiceSpy.register).toHaveBeenCalledWith({...mockUser, password: 'Password123$'});
+    expect(authServiceSpy.registerWithRedirect).toHaveBeenCalledOnceWith({...mockUser, password: 'Password123$'});
   });
 });

@@ -40,3 +40,5 @@ security:
     key: 9faa372517ac1d389758d3750fc07acf00f542277f26fec1ce4593e93f64e338
     expiration: 86400000 # 1 day in ms
     refreshTokenExpiration: 2592000000 # 30 days in ms
+  cors:
+    allowedOrigins: ${ALLOWED_ORIGINS}

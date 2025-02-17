@@ -4,6 +4,7 @@ import {AuthenticationService} from '../services/authentication.service';
 import {TestBed} from '@angular/core/testing';
 import {LoginModel} from '../models/login.model';
 import userEvent from '@testing-library/user-event';
+import {of} from 'rxjs';
 
 describe('LoginComponent', () => {
   const setup = () => ({
@@ -15,10 +16,19 @@ describe('LoginComponent', () => {
   });
 
   beforeEach(async () => {
+    const authServiceMock = jasmine.createSpyObj<AuthenticationService>(
+      'AuthenticationService',
+      ['loginWithRedirect']
+    );
+
+    // Configure the mock to return an Observable<boolean> with the value 'true'
+    authServiceMock.loginWithRedirect.and.returnValue(of(true));
+
     await render(LoginComponent, {
-      providers: [
-        {provide: AuthenticationService, useValue: jasmine.createSpyObj('AuthenticationService', ['login'])}
-      ],
+      providers: [{
+        provide: AuthenticationService,
+        useValue: authServiceMock,
+      }],
     })
   });
 
@@ -43,13 +53,13 @@ describe('LoginComponent', () => {
     // Because not all fields are filled, the button should be disabled.
     expect(loginButton.disabled).toBeTruthy();
     fireEvent.click(loginButton);
-    expect(authServiceSpy.login).not.toHaveBeenCalled();
+    expect(authServiceSpy.loginWithRedirect).not.toHaveBeenCalled();
 
     // Fill the password.
     await user.type(passwordInput, mockUser.password);
     // The login method should be called with the correct user login on button click.
     expect(loginButton.disabled).toBeFalsy();
     fireEvent.click(loginButton);
-    expect(authServiceSpy.login).toHaveBeenCalledOnceWith(mockUser);
+    expect(authServiceSpy.loginWithRedirect).toHaveBeenCalledOnceWith(mockUser);
   });
 });
