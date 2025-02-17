@@ -39,3 +39,5 @@ security:
     key: ${JWT_SECRET_KEY}
     expiration: 86400000 # 1 day in ms
     refreshTokenExpiration: 2592000000 # 30 days in ms
+  cors:
+    allowedOrigins: ${ALLOWED_ORIGINS}

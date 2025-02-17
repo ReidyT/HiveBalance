@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, DestroyRef, inject, signal} from '@angular/core';
 import {AuthenticationService} from '../services/authentication.service';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Button} from 'primeng/button';
@@ -9,6 +9,7 @@ import {Password} from 'primeng/password';
 import {StackComponent} from '../../shared/components/stack.component';
 import {CardContainerComponent} from '../../shared/components/card-container.component';
 import {RouterLink} from '@angular/router';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,8 @@ import {RouterLink} from '@angular/router';
     <app-card-container data-testid="login-card">
       <p-card class="w-20rem md:w-30rem">
         <ng-template #header>
-          <img alt="HiveBalance Logo" class="w-full md:h-20rem" src="/assets/hive_balance_logo.svg" height="200px"/>
+          <img alt="HiveBalance Logo" class="w-full md:h-20rem" src="/assets/hive_balance_logo.svg"
+               height="200px"/>
         </ng-template>
         <ng-template #title>Welcome back !</ng-template>
         <ng-template #subtitle>Don't have an account? <a routerLink="/signUp">Sign Up</a>
@@ -35,7 +37,8 @@ import {RouterLink} from '@angular/router';
         <form [formGroup]="loginForm" (submit)="login()">
           <app-stack [gap]="3">
             <p-floatlabel variant="in">
-              <input autocomplete="off" name="usernameOrEmail" formControlName="usernameOrEmail" id="usernameOrEmail"
+              <input autocomplete="off" name="usernameOrEmail" formControlName="usernameOrEmail"
+                     id="usernameOrEmail"
                      pInputText type="text" fluid/>
               <label for="usernameOrEmail">Username or Email</label>
             </p-floatlabel>
@@ -47,6 +50,7 @@ import {RouterLink} from '@angular/router';
               <label for="password">Password</label>
             </p-floatlabel>
             <p-button [disabled]="loginForm.invalid"
+                      [loading]="isLoading()"
                       type="submit"
                       class="w-full"
                       styleClass="w-full">
@@ -63,14 +67,20 @@ export class LoginComponent {
     usernameOrEmail: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
+  protected isLoading = signal(false);
   private authenticationService = inject(AuthenticationService);
+  private destroyRef = inject(DestroyRef);
 
   protected login() {
     if (this.loginForm.valid) {
-      this.authenticationService.login({
+      this.isLoading.set(true);
+      this.authenticationService.loginWithRedirect({
         usernameOrEmail: this.loginForm.value.usernameOrEmail!,
         password: this.loginForm.value.password!,
-      })
+      }).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: _ => this.isLoading.set(false),
+        });
     } else {
       // Should never happen.
       console.error(this.loginForm.errors)

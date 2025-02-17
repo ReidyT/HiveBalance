@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, DestroyRef, inject, signal} from '@angular/core';
 import {InputTextModule} from 'primeng/inputtext';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {AuthenticationService} from '../services/authentication.service';
@@ -15,6 +15,7 @@ import {FluidModule} from 'primeng/fluid';
 import {Card} from 'primeng/card';
 import {CardContainerComponent} from '../../shared/components/card-container.component';
 import {RouterLink} from '@angular/router';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-registration',
@@ -73,6 +74,7 @@ import {RouterLink} from '@angular/router';
               </app-stack>
             </form>
             <p-button [disabled]="registrationForm.invalid"
+                      [loading]="isLoading()"
                       type="submit"
                       class="w-full"
                       styleClass="w-full">
@@ -128,16 +130,21 @@ export class RegistrationComponent {
       return passwordsControl.errors[MISMATCH_KEY].message
     }
   };
-
+  protected isLoading = signal(false);
+  private destroyRef = inject(DestroyRef);
   private authenticationService = inject(AuthenticationService);
 
   protected register() {
     if (this.registrationForm.valid) {
-      this.authenticationService.register({
+      this.isLoading.set(true);
+      this.authenticationService.registerWithRedirect({
         username: this.registrationForm.value.username!,
         email: this.registrationForm.value.email!,
         password: this.registrationForm.value.passwords!.password!,
-      })
+      }).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: _ => this.isLoading.set(false),
+        });
     } else {
       // Should never happen.
       console.error(this.registrationForm.errors)

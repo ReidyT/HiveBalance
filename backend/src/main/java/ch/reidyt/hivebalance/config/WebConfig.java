@@ -1,15 +1,17 @@
 package ch.reidyt.hivebalance.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@RequiredArgsConstructor
 @Configuration
 public class WebConfig {
+    private final CorsProperties corsProperties;
 
     @Bean
     public WebMvcConfigurer cors() {
@@ -17,9 +19,15 @@ public class WebConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:8080")
-                        .allowedHeaders(HttpHeaders.CONTENT_TYPE, "X-CSRF-TOKEN")
-                        .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name())
+                        .allowedOrigins(corsProperties.getAllowedOrigins())
+                        .allowedHeaders("Authorization", "Content-Type")
+                        .allowedMethods(
+                                HttpMethod.GET.name(),
+                                HttpMethod.POST.name(),
+                                HttpMethod.PUT.name(),
+                                HttpMethod.DELETE.name(),
+                                HttpMethod.OPTIONS.name()
+                        )
                         .allowCredentials(true);
             }
         };
