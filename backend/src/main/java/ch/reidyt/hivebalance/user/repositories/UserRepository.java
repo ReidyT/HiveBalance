@@ -11,6 +11,6 @@ import ch.reidyt.hivebalance.user.models.BeeUser;
 
 @Repository
 public interface UserRepository extends JpaRepository<BeeUser, UUID> {
-  @Query("SELECT be FROM BeeUser be WHERE (be.email = :loginIdentifier OR be.username = :loginIdentifier)")
-  Optional<BeeUser> findByLoginIdentifier(String loginIdentifier);
+    @Query("SELECT be FROM BeeUser be WHERE (LOWER(be.email) = LOWER(:loginIdentifier) OR LOWER(be.username) = LOWER(:loginIdentifier))")
+    Optional<BeeUser> findByLoginIdentifier(String loginIdentifier);
 }
