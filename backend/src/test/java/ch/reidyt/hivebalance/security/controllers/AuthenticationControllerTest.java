@@ -92,16 +92,16 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void user_can_login_with_username_or_email() {
+    void user_can_login_with_username_or_email_case_insensitive() {
         utils.assertProtectedResourceUnauthorized(null);
 
         var user = userUtils.createRandomUserWithStrongPassword();
         utils.registerUser(user);
-        var resByEmail = utils.loginUser(user.email(), user.password());
+        var resByEmail = utils.loginUser(user.email().toUpperCase(), user.password());
         var tokensByEmail = utils.assertNotNullTokens(resByEmail);
         utils.assertProtectedResourceOk(tokensByEmail.getAccessToken());
 
-        var resByUsername = utils.loginUser(user.username(), user.password());
+        var resByUsername = utils.loginUser(user.username().toUpperCase(), user.password());
         var tokensByUsername = utils.assertNotNullTokens(resByUsername);
         utils.assertProtectedResourceOk(tokensByUsername.getAccessToken());
     }
