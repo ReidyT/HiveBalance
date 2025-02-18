@@ -8,7 +8,7 @@
 
 The following items are the major targets for HiveBalance's first stable release:
 
-- [ ] 🔐 **Account Management:** Secure account creation and login.
+- [x] 🔐 **Account Management:** Secure account creation and login.
 - [ ] 💳 **Wallet Creation:** Create and manage multiple expense wallets.
 - [ ] 📨 **User Invitation:** Invite others to participate in your wallets.
 - [ ] 💶 **Expense Tracking:** Add, update, and split expenses with the other users.
