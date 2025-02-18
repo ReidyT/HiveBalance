@@ -18,6 +18,11 @@ test('guest user should register or log in to access protected home', async ({pa
   await page.locator("[data-testid = 'registration-confirm']").getByRole('textbox').fill(password);
   await page.getByRole("button", {name: /sign up/i}).click();
 
+  // Ensure the server responded with a 201 Created.
+  expect((await page.waitForResponse((response) =>
+    response.url().includes('/auth/register')
+  )).status()).toBe(201);
+
   // The user should be redirected to the home page.
   await expect(page.getByText("You are authenticated, some content will be added soon!")).toBeInViewport();
   expect((new URL(page.url()).pathname)).toBe('/');
@@ -25,10 +30,20 @@ test('guest user should register or log in to access protected home', async ({pa
   // Logout the user should redirect it to the login page.
   await page.getByRole("button", {name: "Log out"}).click();
 
+  // Ensure the server responded with a 201 Created.
+  expect((await page.waitForResponse((response) =>
+    response.url().includes('/auth/logout')
+  )).status()).toBe(200);
+
   // Login the user by email.
   await page.getByRole("textbox", {name: "Username or Email"}).fill(email);
   await page.locator("[data-testid = 'login-password']").getByRole('textbox').fill(password);
   await page.getByRole("button", {name: "Log in"}).click();
+
+  // Ensure the server responded with a 201 Created.
+  expect((await page.waitForResponse((response) =>
+    response.url().includes('/auth/login')
+  )).status()).toBe(201);
 
   // The user should be redirected to the home page.
   await expect(page.getByText("You are authenticated, some content will be added soon!")).toBeInViewport();
@@ -36,6 +51,10 @@ test('guest user should register or log in to access protected home', async ({pa
 
   // Logout the user should redirect to the login page.
   await page.getByRole("button", {name: "Log out"}).click();
+  // Ensure the server responded with a 201 Created.
+  expect((await page.waitForResponse((response) =>
+    response.url().includes('/auth/logout')
+  )).status()).toBe(200);
   await expect(page.getByText("You are authenticated, some content will be added soon!")).not.toBeInViewport();
   expect((new URL(page.url()).pathname)).toBe('/login');
 });

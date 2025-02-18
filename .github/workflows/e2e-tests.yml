@@ -1,0 +1,89 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d testdb"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive #Important for mono-repos!  Ensure submodules are also checked out
+          fetch-depth: 0 #Needed to get all commit history for gitflow checks
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Build Angular App
+        run: npm run build --if-present
+        working-directory: ./frontend
+
+      - name: Install Playwright Browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Set up JDK and Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: maven
+
+      - name: Install backend dependencies
+        run: mvn clean install -DskipTests
+        working-directory: ./backend
+
+      - name: Start Spring Boot Application
+        run: mvn spring-boot:run &
+        working-directory: ./backend
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+          ENVIRONMENT: dev
+          JWT_SECRET_KEY: 9faa372517ac1d389758d3750fc07acf00f542277f26fec1ce4593e93f64e338
+          ALLOWED_ORIGINS: http://localhost:4200
+
+      - name: Wait for backend health check
+        run: |
+          echo "Waiting for backend to be ready..."
+          until curl --silent --fail --max-time 5 http://localhost:8080/checks/health; do
+            echo "Backend not ready. Retrying..."
+            sleep 5
+          done
+          echo "Backend is ready!"
+
+      - name: Run Playwright Tests
+        run: npm run e2e
+        working-directory: ./frontend
