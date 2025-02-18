@@ -1,4 +1,4 @@
-import {HttpHandlerFn, HttpInterceptorFn, HttpRequest} from '@angular/common/http';
+import {HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpStatusCode} from '@angular/common/http';
 import {inject} from '@angular/core';
 import {AuthenticationService} from '../services/authentication.service';
 import {catchError, switchMap, throwError} from 'rxjs';
@@ -46,7 +46,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(authReq).pipe(
       catchError((error) => {
         // Check if the error is due to an expired access token
-        if (error.status === 401 && accessToken) {
+        if (error.status === HttpStatusCode.Unauthorized && accessToken) {
           handleTokenExpired(req, next, authService);
         }
 

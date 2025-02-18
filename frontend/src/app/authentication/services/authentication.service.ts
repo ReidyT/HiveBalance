@@ -1,5 +1,5 @@
 import {computed, effect, inject, Injectable, signal} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpStatusCode} from '@angular/common/http';
 import {RegistrationModel} from '../models/registration.model';
 import {LoginModel} from '../models/login.model';
 import {catchError, map, tap, throwError} from 'rxjs';
@@ -58,8 +58,8 @@ export class AuthenticationService {
       tap(tokens => this.setTokens(tokens)),
       tap(() => this.router.navigate([redirectTo])), // Navigate on success
       map(() => true), // Signal success
-      catchError(error => {
-        if (error.status === 401) {
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === HttpStatusCode.Unauthorized) {
           console.error('Login failed:', error);
           //Revert any token state changes.
           this.clearTokens();
@@ -91,7 +91,7 @@ export class AuthenticationService {
       tap((tokens) => this.setTokens(tokens)),
       map((tokens) => tokens.access_token),
       catchError(async (error) => {
-        if (error.status === 401) {
+        if (error.status === HttpStatusCode.Unauthorized) {
           // Handle refresh token error (e.g., redirect to login page)
           console.error('Error refreshing access token:', error);
           this.clearTokens();

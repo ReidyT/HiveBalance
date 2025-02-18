@@ -27,8 +27,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -66,13 +69,31 @@ public class SpringSecurityConfig {
     }
 
     @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource(CorsProperties corsProperties) {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(corsProperties.getAllowedOrigins()));
+        configuration.setAllowedMethods(List.of(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
+        ));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TokenService tokenService)
             throws Exception {
 
         return http
                 // enable CSRF if using stateful sessions!
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(c -> c.authenticationEntryPoint(new LoginAuthEntryPoint()))
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
                 .addFilterBefore(new BlacklistTokenFilter(tokenService),
