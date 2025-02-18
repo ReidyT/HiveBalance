@@ -14,8 +14,8 @@ class AuthRoutes {
   public readonly logoutUrl;
   public readonly refreshAccessTokenUrl;
 
-  constructor(private backendUrl: string) {
-    this.authUrl = this.backendUrl + '/auth';
+  constructor(backendUrl: string) {
+    this.authUrl = backendUrl + '/auth';
     this.registrationUrl = this.authUrl + '/register';
     this.loginUrl = this.authUrl + '/login';
     this.logoutUrl = this.authUrl + '/logout';

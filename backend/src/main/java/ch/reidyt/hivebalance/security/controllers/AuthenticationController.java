@@ -5,8 +5,6 @@ import ch.reidyt.hivebalance.security.dtos.TokensDTO;
 import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
 import ch.reidyt.hivebalance.security.services.AuthenticationService;
 import ch.reidyt.hivebalance.security.services.TokenService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +21,7 @@ public class AuthenticationController {
     private final TokenService tokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<TokensDTO> register(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO,
-                                              HttpServletRequest request,
-                                              HttpServletResponse response) {
+    public ResponseEntity<TokensDTO> register(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
         var authentication = authenticationService.registerUser(userRegistrationDTO);
         // Parent id is null because the tokens are generated from the credentials and
         // not from the refresh token.
@@ -51,7 +47,11 @@ public class AuthenticationController {
 
         if (!tokenService.isRefreshToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "The given token is not a valid refresh token."));
+                    .body(new ErrorResponse(
+                            "Authorization failed",
+                            "The given token is not a valid refresh token.",
+                            HttpStatus.FORBIDDEN
+                    ));
         }
 
         // Generate a new token pair

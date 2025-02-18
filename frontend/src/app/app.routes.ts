@@ -3,7 +3,7 @@ import {RegistrationComponent} from './authentication/components/registration.co
 import {LoginComponent} from './authentication/components/login.component';
 import {HomeComponent} from './home/home.component';
 import {authGuard} from './authentication/guards/auth.guard';
-import {unAuthGuard} from './authentication/guards/unauthicated.guard';
+import {unAuthGuard} from './authentication/guards/unauth.guard';
 
 export const routes: Routes = [
   {path: 'signUp', component: RegistrationComponent, canActivate: [unAuthGuard]},
