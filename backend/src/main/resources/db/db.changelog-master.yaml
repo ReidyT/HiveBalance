@@ -4,4 +4,4 @@ databaseChangeLog:
   - include:
       file: db/changes/20250121151505-add-token-table.sql
   - include:
-      file: db/changes/20250224122148-add-wallet-currency-permission-tables.sql
+      file: db/changes/20250224171850-add-wallet-currency-permission-tables.sql
