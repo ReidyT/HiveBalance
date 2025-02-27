@@ -1,15 +1,14 @@
 package ch.reidyt.hivebalance.security.repositories;
 
-import java.time.Instant;
-import java.util.UUID;
-
+import ch.reidyt.hivebalance.security.models.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.reidyt.hivebalance.security.models.Token;
+import java.time.Instant;
+import java.util.UUID;
 
 @Repository
 public interface TokenRepository extends JpaRepository<Token, UUID> {
@@ -23,17 +22,19 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
 
     @Transactional
     @Modifying
-    @Query(value = "WITH RelatedTokens AS (" +
-            "           SELECT parent_id AS token_id " +
-            "           FROM token " +
-            "           WHERE token_id = :accessTokenId " +
-            "           UNION ALL " +
-            "           SELECT :accessTokenId " +
-            "       ) " +
-            "       UPDATE token " +
-            "       SET is_blacklisted = 'true' " +
-            "       FROM RelatedTokens " +
-            "       WHERE token.token_id = RelatedTokens.token_id", nativeQuery = true)
+    @Query(value = """
+            WITH RelatedTokens AS (
+                       SELECT parent_id AS token_id
+                       FROM token
+                       WHERE token_id = :accessTokenId
+                       UNION ALL
+                       SELECT :accessTokenId
+                   )
+                   UPDATE token
+                   SET is_blacklisted = 'true'
+                   FROM RelatedTokens
+                   WHERE token.token_id = RelatedTokens.token_id
+            """, nativeQuery = true)
     void blacklistByAccessToken(UUID accessTokenId);
 
     @Transactional

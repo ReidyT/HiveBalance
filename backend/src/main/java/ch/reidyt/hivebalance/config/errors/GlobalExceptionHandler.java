@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -62,6 +63,17 @@ public class GlobalExceptionHandler {
         ErrorResponse message = new ErrorResponse(
                 "HttpMessageConversionException",
                 "Required request body is missing.",
+                HttpStatus.BAD_REQUEST
+        );
+        return new ResponseEntity<>(message, message.getStatusCode());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        // TODO: translate
+        ErrorResponse message = new ErrorResponse(
+                "MethodArgumentTypeMismatchException",
+                ex.getLocalizedMessage(),
                 HttpStatus.BAD_REQUEST
         );
         return new ResponseEntity<>(message, message.getStatusCode());

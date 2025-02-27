@@ -1,6 +1,11 @@
 package ch.reidyt.hivebalance.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -39,6 +44,31 @@ public abstract class HttpTestUtils {
         return httpEntityFactory(token, null);
     }
 
+    public static <T> T exchange(
+            TestRestTemplate restTemplate,
+            String route,
+            HttpMethod httpMethod,
+            String accessToken,
+            TypeReference<T> responseType
+    ) {
+        var res = restTemplate.exchange(
+                route,
+                httpMethod,
+                httpEntityFactory(accessToken),
+                String.class
+        );
+
+        if (res.getStatusCode() == HttpStatus.OK) {
+            try {
+                return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(res.getBody(), responseType);
+            } catch (JsonProcessingException e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+
+        throw new HttpException(res.getStatusCode());
+    }
+
     /**
      * Asserts that accessing a protected resource with the given token results in the expected HTTP status.
      *
@@ -71,5 +101,4 @@ public abstract class HttpTestUtils {
     public void assertProtectedResourceOk(String route, String accessToken) {
         assertProtectedResource(route, accessToken, HttpStatus.OK);
     }
-
 }
