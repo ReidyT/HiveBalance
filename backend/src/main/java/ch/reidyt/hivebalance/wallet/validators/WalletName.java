@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Pattern(regexp = "^[A-Za-zÀ-ÿα-ωА-Яа-яЁё]+([ ._-][A-Za-zÀ-ÿα-ωА-Яа-яЁё0-9]+)*$")
+@Pattern(regexp = "^[A-Za-zÀ-ÿα-ωА-Яа-яЁё0-9]+([ ._-][A-Za-zÀ-ÿα-ωА-Яа-яЁё0-9]+)*$")
 public @interface WalletName {
     String message() default "Wallet name must contain only letters, numbers, separators (., _, - or space), and begin and end with a letter. No punctuation or spaces before or after the name are allowed.";
 
