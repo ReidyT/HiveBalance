@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,8 +40,12 @@ public class WalletService {
 
         return wallet;
     }
-    
+
     public List<GrantedWalletDTO> getAllGrantedUserWallets(UUID currentUserId) {
         return walletRepository.findAllGrantedWalletsByUserId(currentUserId);
+    }
+
+    public Optional<Wallet> getWalletById(UUID currentUserId, UUID walletId) {
+        return walletRepository.findGrantedWalletById(currentUserId, walletId);
     }
 }

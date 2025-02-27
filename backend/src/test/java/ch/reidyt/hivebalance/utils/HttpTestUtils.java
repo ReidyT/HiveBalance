@@ -3,6 +3,7 @@ package ch.reidyt.hivebalance.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +60,7 @@ public abstract class HttpTestUtils {
 
         if (res.getStatusCode() == HttpStatus.OK) {
             try {
-                return new ObjectMapper().readValue(res.getBody(), responseType);
+                return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(res.getBody(), responseType);
             } catch (JsonProcessingException e) {
                 Assert.fail(e.getMessage());
             }

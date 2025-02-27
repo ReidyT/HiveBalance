@@ -17,6 +17,7 @@ public class WalletTestUtils extends HttpTestUtils {
 
     private static final String CREATE_WALLET_ROUTE = "/wallets";
     private static final String GET_USER_GRANTED_WALLETS_ROUTE = "/wallets";
+    private static final String GET_WALLET_ROUTE = "/wallets/%s";
 
     public WalletTestUtils(TestRestTemplate restTemplate) {
         super(restTemplate);
@@ -30,6 +31,17 @@ public class WalletTestUtils extends HttpTestUtils {
         return exchange(
                 restTemplate,
                 GET_USER_GRANTED_WALLETS_ROUTE,
+                HttpMethod.GET,
+                accessToken,
+                new TypeReference<>() {
+                }
+        );
+    }
+
+    public Wallet getWalletById(String accessToken, String walletId) {
+        return exchange(
+                restTemplate,
+                String.format(GET_WALLET_ROUTE, walletId),
                 HttpMethod.GET,
                 accessToken,
                 new TypeReference<>() {

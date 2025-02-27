@@ -21,7 +21,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -157,5 +159,53 @@ class WalletControllerTest {
         var res = utils.getUserGrantedWallets(u1).stream().map(GrantedWalletDTO::name).toList();
         Assertions.assertEquals(res, Arrays.stream(wallets_u1).map(CreateWalletDTO::name).toList());
         Assertions.assertNotEquals(res, Arrays.stream(wallets_u2).map(CreateWalletDTO::name).toList());
+    }
+
+    @Test
+    void get_wallet_by_id_if_granted() {
+        // Create the wallets for U1
+        var u1 = registerAndGetAccessToken();
+        var resCreate = utils.createWallet(new CreateWalletDTO("U1 W1", "CHF"), u1);
+        Assertions.assertEquals(HttpStatus.CREATED, resCreate.getStatusCode());
+
+        // Retrieve the wallet by id
+        var res = utils.getWalletById(u1, Objects.requireNonNull(resCreate.getBody()).getId().toString());
+        Assertions.assertEquals(resCreate.getBody().getId(), res.getId());
+        Assertions.assertEquals(resCreate.getBody().getName(), res.getName());
+    }
+
+    @Test
+    void get_wallet_without_permission_should_return_not_found() {
+        // Create the wallets for U1
+        var u1 = registerAndGetAccessToken();
+        var resCreate = utils.createWallet(new CreateWalletDTO("U1 W1", "CHF"), u1);
+        Assertions.assertEquals(HttpStatus.CREATED, resCreate.getStatusCode());
+        var walletId = Objects.requireNonNull(resCreate.getBody()).getId().toString();
+
+        // Try to access with user 2
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.getWalletById(registerAndGetAccessToken(), walletId)
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+    }
+
+    @Test
+    void get_wallet_non_existing_wallet_id_should_return_not_found() {
+        // Try to access to a non-exist wallet
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.getWalletById(registerAndGetAccessToken(), UUID.randomUUID().toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+    }
+    
+    @Test
+    void get_wallet_with_invalid_uuid_should_return_bad_request() {
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.getWalletById(registerAndGetAccessToken(), "INVALID-UUID")
+        );
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), ex.httpStatusCode.value());
     }
 }
