@@ -3,7 +3,6 @@ package ch.reidyt.hivebalance.utils;
 
 import ch.reidyt.hivebalance.security.dtos.TokensDTO;
 import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
@@ -12,9 +11,8 @@ import org.springframework.stereotype.Component;
 /**
  * Utility class for testing authentication and authorization flows.
  */
-@RequiredArgsConstructor
 @Component
-public class AuthTestUtils {
+public class AuthTestUtils extends HttpTestUtils {
 
     private static final String PROTECTED_ROUTE = "/checks/auth";
     private static final String REGISTER_ROUTE = "/auth/register";
@@ -22,7 +20,9 @@ public class AuthTestUtils {
     private static final String REFRESH_TOKEN_ROUTE = "/auth/refresh-token";
     private static final String LOGOUT_ROUTE = "/auth/logout";
 
-    private final TestRestTemplate restTemplate;
+    public AuthTestUtils(TestRestTemplate restTemplate) {
+        super(restTemplate);
+    }
 
     /**
      * Registers a new user.
@@ -56,29 +56,13 @@ public class AuthTestUtils {
     }
 
     /**
-     * Creates an HttpEntity with an optional Bearer token in the header.
-     *
-     * @param token The Bearer token to include in the header, or null if no token should be included.
-     * @return The created HttpEntity.
-     */
-    public HttpEntity<String> httpEntityFactory(String token) {
-        var headers = new HttpHeaders();
-        if (token != null) {
-            headers.setBearerAuth(token);
-        }
-        return new HttpEntity<>(null, headers);
-    }
-
-    /**
      * Asserts that accessing a protected resource with the given token results in the expected HTTP status.
      *
      * @param token          The token to use for accessing the protected resource.
      * @param expectedStatus The expected HTTP status code.
      */
     public void assertProtectedResource(String token, HttpStatus expectedStatus) {
-        var requestEntity = httpEntityFactory(token);
-        var response = restTemplate.exchange(PROTECTED_ROUTE, HttpMethod.GET, requestEntity, String.class);
-        Assertions.assertEquals(expectedStatus.value(), response.getStatusCode().value());
+        super.assertProtectedResource(PROTECTED_ROUTE, token, expectedStatus);
     }
 
     /**
@@ -87,7 +71,7 @@ public class AuthTestUtils {
      * @param token The token used to try to access to the route. Can be null or invalid.
      */
     public void assertProtectedResourceUnauthorized(String token) {
-        assertProtectedResource(token, HttpStatus.UNAUTHORIZED);
+        this.assertProtectedResource(token, HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -96,7 +80,7 @@ public class AuthTestUtils {
      * @param accessToken The valid access token.
      */
     public void assertProtectedResourceOk(String accessToken) {
-        assertProtectedResource(accessToken, HttpStatus.OK);
+        this.assertProtectedResource(accessToken, HttpStatus.OK);
     }
 
     /**

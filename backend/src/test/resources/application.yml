@@ -13,6 +13,9 @@ spring:
   liquibase:
     enabled: true
     changeLog: classpath:/db/db.changelog-master.yaml
+  sql:
+    init:
+      mode: always
 logging:
   level:
     org:
@@ -27,6 +30,7 @@ logging:
             bind: TRACE
       springframework:
         security: DEBUG
+      springframework.web: DEBUG
 server:
   servlet:
     session:
