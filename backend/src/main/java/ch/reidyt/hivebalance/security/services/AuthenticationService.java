@@ -1,9 +1,13 @@
 package ch.reidyt.hivebalance.security.services;
 
+import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 
-import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
+import java.util.UUID;
 
 public interface AuthenticationService {
-    public Authentication registerUser(UserRegistrationDTO userRegistrationDTO);
+    Authentication registerUser(UserRegistrationDTO userRegistrationDTO);
+
+    UUID getAuthenticatedUserId(Authentication authentication) throws InsufficientAuthenticationException;
 }

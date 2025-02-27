@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changes/20250110114823-add-user-table.sql
   - include:
       file: db/changes/20250121151505-add-token-table.sql
+  - include:
+      file: db/changes/20250224171850-add-wallet-currency-permission-tables.sql

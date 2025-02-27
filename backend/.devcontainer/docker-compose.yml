@@ -4,6 +4,7 @@ networks:
 
 volumes:
   postgres-data:
+  pgadmin-data:
   m2-cache:
 
 
@@ -46,5 +47,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - devcontainer-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@email.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     networks:
       - devcontainer-network

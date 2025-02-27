@@ -4,10 +4,13 @@ import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
 import ch.reidyt.hivebalance.user.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +28,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 userRegistrationDTO.password());
 
         return authenticationManager.authenticate(usernamePasswordToken);
+    }
+
+    public UUID getAuthenticatedUserId(Authentication authentication) {
+        if (!authentication.isAuthenticated()) {
+            throw new InsufficientAuthenticationException("The user must be authenticated to retrieve its ID.");
+        }
+        return UUID.fromString(authentication.getName());
     }
 }

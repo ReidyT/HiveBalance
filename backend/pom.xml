@@ -148,7 +148,7 @@
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.30.0</version>
+                <version>4.31.1</version>
                 <configuration>
                     <changeLogFile>${dbChangeLogPath}/db.changelog-master.yaml</changeLogFile>
                     <diffChangeLogFile>${dbChangeLogPath}/changes/${diffChangeLogFileName}</diffChangeLogFile>
@@ -166,7 +166,7 @@
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-hibernate6</artifactId>
-                        <version>4.30.0</version>
+                        <version>4.31.1</version>
                     </dependency>
                     <dependency>
                         <groupId>org.springframework.boot</groupId>

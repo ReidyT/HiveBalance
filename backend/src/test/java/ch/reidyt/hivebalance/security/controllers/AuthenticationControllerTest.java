@@ -1,5 +1,6 @@
 package ch.reidyt.hivebalance.security.controllers;
 
+import ch.reidyt.hivebalance.base.config.TestDatabaseConfig;
 import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
 import ch.reidyt.hivebalance.utils.AuthTestUtils;
 import ch.reidyt.hivebalance.utils.MockUserUtils;
@@ -10,9 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -23,26 +23,18 @@ import java.util.Random;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthenticationControllerTest {
-
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.2");
-    static int seed = new Random().nextInt();
-    static MockUserUtils userUtils = MockUserUtils.builder().seed(seed).build();
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = TestDatabaseConfig.createPostgreSQLContainer();
+
+    private static final int seed = new Random().nextInt();
+    private static final MockUserUtils userUtils = MockUserUtils.builder().seed(seed).build();
     @Autowired
     AuthTestUtils utils;
-    @Autowired
-    private AuthTestUtils authTestUtils;
 
     @BeforeAll
     public static void info() {
         System.out.println("Seed " + seed);
-    }
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
     }
 
     @Test
@@ -369,7 +361,7 @@ public class AuthenticationControllerTest {
     })
     void login_with_invalid_credentials_should_return_401(String operation) {
         var user = userUtils.createRandomUserWithStrongPassword();
-        authTestUtils.registerUser(user);
+        utils.registerUser(user);
 
         var identifier = user.username();
         var password = user.password();
