@@ -27,8 +27,8 @@ public class WalletController {
             @Valid @RequestBody CreateWalletDTO createWalletDTO,
             Authentication authentication
     ) {
-        var beeUser = authenticationService.getAuthenticatedUser(authentication);
-        var wallet = walletService.addWallet(beeUser, createWalletDTO);
+        var userId = authenticationService.getAuthenticatedUserId(authentication);
+        var wallet = walletService.addWallet(userId, createWalletDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(wallet);
     }

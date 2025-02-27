@@ -39,12 +39,18 @@ public class Permission {
     private Instant createdAt = Instant.now();
 
     public Permission(Id id, BeeUser beeUser, Wallet wallet, WalletPermission permission, Instant createdAt) {
-        if (id == null) {
+        if (id != null) {
+            this.id = id;
+
+            if (beeUser != null && !id.userId.equals(beeUser.getId())) {
+                throw new IllegalStateException("The given id should contains the same user id as in the given user.");
+            } else if (wallet != null && !id.walletId.equals(wallet.getId())) {
+                throw new IllegalStateException("The given id should contains the same wallet id as in the given wallet.");
+            }
+        } else if (beeUser == null || wallet == null) {
+            throw new IllegalStateException("The id or (BeeUser and Wallet) should be defined.");
+        } else {
             this.id = new Id(beeUser.getId(), wallet.getId());
-        } else if (!id.userId.equals(beeUser.getId())) {
-            throw new IllegalStateException("The given id should contains the same user id as in the given user.");
-        } else if (!id.walletId.equals(wallet.getId())) {
-            throw new IllegalStateException("The given id should contains the same wallet id as in the given wallet.");
         }
 
         this.beeUser = beeUser;
