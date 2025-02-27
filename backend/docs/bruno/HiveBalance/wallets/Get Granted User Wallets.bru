@@ -1,0 +1,22 @@
+meta {
+  name: Get Granted User Wallets
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{BACKEND_URL}}/wallets
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+body:json {
+  {
+    "name": "My trip to Switzerland",
+    "currencyCode": "CHF"
+  }
+}
