@@ -1,6 +1,6 @@
 package ch.reidyt.hivebalance.wallet.controllers;
 
-import ch.reidyt.hivebalance.base.controllers.TestController;
+import ch.reidyt.hivebalance.base.config.TestDatabaseConfig;
 import ch.reidyt.hivebalance.utils.AuthTestUtils;
 import ch.reidyt.hivebalance.utils.MockUserUtils;
 import ch.reidyt.hivebalance.utils.WalletTestUtils;
@@ -11,18 +11,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatus;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Random;
 
-class WalletControllerTest extends TestController {
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class WalletControllerTest {
+    @Container
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = TestDatabaseConfig.createPostgreSQLContainer();
+
     private static final int seed = new Random().nextInt();
-
     private static final MockUserUtils mockUserUtils = MockUserUtils.builder().seed(seed).build();
-
     @Autowired
     WalletTestUtils utils;
-
     @Autowired
     AuthTestUtils authTestUtils;
 

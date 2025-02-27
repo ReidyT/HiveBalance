@@ -1,25 +1,34 @@
 package ch.reidyt.hivebalance.security.controllers;
 
+import ch.reidyt.hivebalance.base.config.TestDatabaseConfig;
 import ch.reidyt.hivebalance.security.dtos.UserRegistrationDTO;
 import ch.reidyt.hivebalance.utils.AuthTestUtils;
 import ch.reidyt.hivebalance.utils.MockUserUtils;
-import ch.reidyt.hivebalance.base.controllers.TestController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatus;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class AuthenticationControllerTest extends TestController {
-    private static final int seed = new Random().nextInt();
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class AuthenticationControllerTest {
+    @Container
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = TestDatabaseConfig.createPostgreSQLContainer();
 
+    private static final int seed = new Random().nextInt();
     private static final MockUserUtils userUtils = MockUserUtils.builder().seed(seed).build();
-    
     @Autowired
     AuthTestUtils utils;
 
