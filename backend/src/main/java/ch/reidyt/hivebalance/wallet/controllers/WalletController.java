@@ -4,6 +4,7 @@ import ch.reidyt.hivebalance.security.services.AuthenticationService;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.UpdateWalletDTO;
 import ch.reidyt.hivebalance.wallet.errors.WalletNotFoundException;
 import ch.reidyt.hivebalance.wallet.models.Wallet;
 import ch.reidyt.hivebalance.wallet.services.WalletService;
@@ -49,6 +50,17 @@ public class WalletController {
         var userId = authenticationService.getAuthenticatedUserId(authentication);
         var wallet = walletService.getWalletById(userId, walletId)
                 .orElseThrow(() -> new WalletNotFoundException(walletId));
+
+        return ResponseEntity.status(HttpStatus.OK).body(wallet);
+    }
+
+    @PatchMapping("/{walletId}")
+    public ResponseEntity<Wallet> updateWalletById(
+            @PathVariable UUID walletId,
+            @Valid @RequestBody UpdateWalletDTO updateWalletDTO,
+            Authentication authentication) {
+        var userId = authenticationService.getAuthenticatedUserId(authentication);
+        var wallet = walletService.updateWalletById(userId, walletId, updateWalletDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(wallet);
     }

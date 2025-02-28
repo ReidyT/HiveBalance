@@ -1,0 +1,22 @@
+meta {
+  name: Patch Wallet
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{BACKEND_URL}}/wallets/15d975d2-5be5-4082-a91b-e57a9a69538c
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+body:json {
+  {
+    "name": "My trip to Europe",
+    "currencyCode": "EUR"
+  }
+}

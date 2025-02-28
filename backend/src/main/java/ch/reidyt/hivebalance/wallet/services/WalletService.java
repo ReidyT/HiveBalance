@@ -5,6 +5,7 @@ import ch.reidyt.hivebalance.permission.models.Permission;
 import ch.reidyt.hivebalance.permission.repositories.PermissionRepository;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.UpdateWalletDTO;
 import ch.reidyt.hivebalance.wallet.errors.InvalidCurrencyException;
 import ch.reidyt.hivebalance.wallet.errors.WalletNotFoundException;
 import ch.reidyt.hivebalance.wallet.models.Wallet;
@@ -27,6 +28,16 @@ public class WalletService {
     private final PermissionRepository permissionRepository;
 
     private final CurrencyRepository currencyRepository;
+
+    private void checkUserCanManageWallet(UUID currentUserId, UUID walletId) {
+        // User must own the wallet to have the permission to manage it (delete or update it).
+        var canManage = permissionRepository.hasWalletPermission(currentUserId, walletId, WalletPermission.OWNER);
+
+        // If the wallet doesn't exist or the user doesn't have the permission, throw not found.
+        if (!canManage) {
+            throw new WalletNotFoundException(walletId);
+        }
+    }
 
     @Transactional
     public Wallet addWallet(UUID currentUserId, CreateWalletDTO createWalletDTO) {
@@ -55,12 +66,7 @@ public class WalletService {
     @Transactional
     public void deleteWalletById(UUID currentUserId, UUID walletId) throws WalletNotFoundException {
         // User must own the wallet to have the permission to delete it.
-        var canDelete = permissionRepository.hasWalletPermission(currentUserId, walletId, WalletPermission.OWNER);
-
-        // If the wallet doesn't exist or the user doesn't have the permission, throw not found.
-        if (!canDelete) {
-            throw new WalletNotFoundException(walletId);
-        }
+        checkUserCanManageWallet(currentUserId, walletId);
 
         // Remove all the permissions on this wallet to avoid foreign key violation constraint.
         // Ideally, the on delete cascade should be used here, but it doesn't seem to work here...
@@ -68,5 +74,32 @@ public class WalletService {
 
         // Then the wallet can be removed.
         walletRepository.deleteById(walletId);
+    }
+
+    @Transactional
+    public Wallet updateWalletById(UUID currentUserId, UUID walletId, UpdateWalletDTO updateWalletDTO) {
+        // User must own the wallet to have the permission to edit it.
+        checkUserCanManageWallet(currentUserId, walletId);
+
+        var optionalWallet = walletRepository.findGrantedWalletById(currentUserId, walletId);
+
+        if (optionalWallet.isEmpty()) {
+            throw new WalletNotFoundException(walletId);
+        }
+
+        var wallet = optionalWallet.get();
+
+        if (updateWalletDTO.name() != null) {
+            wallet.setName(updateWalletDTO.name());
+        }
+
+        if (updateWalletDTO.currencyCode() != null) {
+            var currency = currencyRepository.findById(updateWalletDTO.currencyCode())
+                    .orElseThrow(() -> new InvalidCurrencyException(updateWalletDTO.currencyCode()));
+
+            wallet.setCurrency(currency);
+        }
+
+        return walletRepository.save(wallet);
     }
 }

@@ -44,17 +44,17 @@ public abstract class HttpTestUtils {
         return httpEntityFactory(token, null);
     }
 
-    public static <T> T exchange(
+    public static <T, BodyType> T exchange(
             TestRestTemplate restTemplate,
             String route,
             HttpMethod httpMethod,
-            String accessToken,
+            HttpEntity<BodyType> httpEntity,
             TypeReference<T> responseType
     ) {
         var res = restTemplate.exchange(
                 route,
                 httpMethod,
-                httpEntityFactory(accessToken),
+                httpEntity,
                 String.class
         );
 
@@ -67,6 +67,16 @@ public abstract class HttpTestUtils {
         }
 
         throw new HttpException(res.getStatusCode());
+    }
+
+    public static <T> T exchange(
+            TestRestTemplate restTemplate,
+            String route,
+            HttpMethod httpMethod,
+            String accessToken,
+            TypeReference<T> responseType
+    ) {
+        return exchange(restTemplate, route, httpMethod, httpEntityFactory(accessToken), responseType);
     }
 
     /**

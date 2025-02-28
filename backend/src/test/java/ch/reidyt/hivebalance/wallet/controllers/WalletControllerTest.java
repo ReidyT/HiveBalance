@@ -12,6 +12,7 @@ import ch.reidyt.hivebalance.utils.WalletTestUtils;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.UpdateWalletDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -325,6 +326,113 @@ class WalletControllerTest {
         var ex = Assertions.assertThrows(
                 HttpException.class,
                 () -> utils.deleteWalletById(accessToken, "Invalid-uuid")
+        );
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), ex.httpStatusCode.value());
+    }
+
+    @Test
+    void patch_wallet_by_id_should_return_updated_wallet() {
+        // Create the wallet.
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("My New Wallet", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var walletId = Objects.requireNonNull(createRes.getBody()).getId();
+
+        // Update the name and currency
+        var fullUpdatedWallet = new UpdateWalletDTO("Updated Wallet", "EUR");
+        var fullUpdated = utils.patchWalletById(accessToken, walletId.toString(), fullUpdatedWallet);
+        Assertions.assertEquals(fullUpdatedWallet.name(), fullUpdated.getName());
+        Assertions.assertEquals(fullUpdatedWallet.currencyCode(), fullUpdated.getCurrency().getCode());
+        Assertions.assertEquals(walletId, fullUpdated.getId());
+
+        // Update the name only
+        var newName = "Just the name";
+        var nameUpdatedWallet = utils.patchWalletById(accessToken, walletId.toString(), new UpdateWalletDTO(newName, null));
+        Assertions.assertEquals(newName, nameUpdatedWallet.getName());
+        Assertions.assertEquals(fullUpdatedWallet.currencyCode(), nameUpdatedWallet.getCurrency().getCode());
+        Assertions.assertEquals(walletId, nameUpdatedWallet.getId());
+
+        // Update the currency only
+        var newCurrency = "USD";
+        var currencyUpdatedWallet = utils.patchWalletById(accessToken, walletId.toString(), new UpdateWalletDTO(null, newCurrency));
+        Assertions.assertEquals(newName, currencyUpdatedWallet.getName());
+        Assertions.assertEquals(newCurrency, currencyUpdatedWallet.getCurrency().getCode());
+        Assertions.assertEquals(walletId, currencyUpdatedWallet.getId());
+    }
+
+    @Test
+    void patch_wallet_by_id_with_guest_should_return_unauthorized() {
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("Wallet to delete", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var wallet = Objects.requireNonNull(createRes.getBody());
+        var walletId = wallet.getId();
+
+        // Trying to delete without being logged should return unauthorized.
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.patchWalletById(null, walletId.toString(), new UpdateWalletDTO("Test", "CHF"))
+        );
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), ex.httpStatusCode.value());
+
+        // The wallet should not have been updated
+        var getWallet = utils.getWalletById(accessToken, walletId.toString());
+        Assertions.assertEquals(wallet.getName(), getWallet.getName());
+        Assertions.assertEquals(wallet.getCurrency(), getWallet.getCurrency());
+    }
+
+    @Test
+    void patch_wallet_by_id_without_owner_permission_should_return_not_found() {
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("Wallet to delete", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var wallet = Objects.requireNonNull(createRes.getBody());
+        var walletId = wallet.getId();
+
+        // Trying to delete with another user without permission should return not found.
+        var user = registerAndGetAccessToken();
+        var userId = extractUserId(user);
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(user, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+
+        // Add admin permission to the new user
+        permissionRepository.save(Permission.builder()
+                .id(new Permission.Id(userId, walletId))
+                .permission(WalletPermission.ADMIN)
+                .build());
+
+        // Trying to remove with an admin user should return not found. Only owners can remove the wallet!
+        var ex2 = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(user, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex2.httpStatusCode.value());
+
+        // The wallet should not have been updated
+        var getWallet = utils.getWalletById(accessToken, walletId.toString());
+        Assertions.assertEquals(wallet.getName(), getWallet.getName());
+        Assertions.assertEquals(wallet.getCurrency(), getWallet.getCurrency());
+    }
+
+    @Test
+    void patch_wallet_by_id_should_return_not_found_if_not_exist() {
+        var accessToken = registerAndGetAccessToken();
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.patchWalletById(accessToken, UUID.randomUUID().toString(), new UpdateWalletDTO("Test", "CHF"))
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+    }
+
+    @Test
+    void patch_wallet_by_id_should_return_bad_request_if_invalid_uuid() {
+        var accessToken = registerAndGetAccessToken();
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.patchWalletById(accessToken, "Invalid-uuid", new UpdateWalletDTO("Test", "CHF"))
         );
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), ex.httpStatusCode.value());
     }
