@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -30,4 +31,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Permissi
     @Transactional
     @Query("DELETE FROM Permission p WHERE p.wallet.id = :walletId")
     void deleteAllByWalletId(@Param("walletId") UUID walletId);
+
+    @Query("SELECT p FROM Permission p WHERE p.id.walletId = :walletId")
+    List<Permission> getAllByWalletId(@Param("walletId") UUID walletId);
 }
