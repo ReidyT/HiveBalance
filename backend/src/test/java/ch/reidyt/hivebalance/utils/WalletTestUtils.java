@@ -3,6 +3,7 @@ package ch.reidyt.hivebalance.utils;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.UpdateWalletDTO;
 import ch.reidyt.hivebalance.wallet.models.Wallet;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,7 @@ public class WalletTestUtils extends HttpTestUtils {
     private static final String GET_USER_GRANTED_WALLETS_ROUTE = "/wallets";
     private static final String GET_WALLET_ROUTE = "/wallets/%s";
     private static final String DELETE_WALLET_ROUTE = "/wallets/%s";
+    private static final String UPDATE_WALLET_ROUTE = "/wallets/%s";
 
     public WalletTestUtils(TestRestTemplate restTemplate) {
         super(restTemplate);
@@ -46,6 +48,17 @@ public class WalletTestUtils extends HttpTestUtils {
                 String.format(GET_WALLET_ROUTE, walletId),
                 HttpMethod.GET,
                 accessToken,
+                new TypeReference<>() {
+                }
+        );
+    }
+
+    public Wallet patchWalletById(String accessToken, String walletId, UpdateWalletDTO updateWalletDTO) {
+        return exchange(
+                restTemplate,
+                String.format(UPDATE_WALLET_ROUTE, walletId),
+                HttpMethod.PATCH,
+                httpEntityFactory(accessToken, updateWalletDTO),
                 new TypeReference<>() {
                 }
         );
