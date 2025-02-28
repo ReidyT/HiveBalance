@@ -1,11 +1,16 @@
 package ch.reidyt.hivebalance.wallet.controllers;
 
 import ch.reidyt.hivebalance.base.config.TestDatabaseConfig;
+import ch.reidyt.hivebalance.permission.enums.WalletPermission;
+import ch.reidyt.hivebalance.permission.models.Permission;
+import ch.reidyt.hivebalance.permission.repositories.PermissionRepository;
+import ch.reidyt.hivebalance.security.services.JwtTokenConverter;
 import ch.reidyt.hivebalance.utils.AuthTestUtils;
 import ch.reidyt.hivebalance.utils.HttpException;
 import ch.reidyt.hivebalance.utils.MockUserUtils;
 import ch.reidyt.hivebalance.utils.WalletTestUtils;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,6 +43,10 @@ class WalletControllerTest {
     WalletTestUtils utils;
     @Autowired
     AuthTestUtils authTestUtils;
+    @Autowired
+    PermissionRepository permissionRepository;
+    @Autowired
+    JwtTokenConverter jwtTokenConverter;
 
     @BeforeAll
     public static void info() {
@@ -47,6 +56,13 @@ class WalletControllerTest {
     private String registerAndGetAccessToken() {
         var res = authTestUtils.registerUser(mockUserUtils.createRandomUserWithStrongPassword());
         return authTestUtils.assertNotNullTokens(res).getAccessToken();
+    }
+
+    private UUID extractUserId(String accessToken) {
+        return jwtTokenConverter
+                .decode(accessToken)
+                .orElseThrow(() -> new IllegalStateException("Invalid token."))
+                .getUserId();
     }
 
     @ParameterizedTest
@@ -199,12 +215,116 @@ class WalletControllerTest {
         );
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
     }
-    
+
     @Test
     void get_wallet_with_invalid_uuid_should_return_bad_request() {
         var ex = Assertions.assertThrows(
                 HttpException.class,
                 () -> utils.getWalletById(registerAndGetAccessToken(), "INVALID-UUID")
+        );
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), ex.httpStatusCode.value());
+    }
+
+    @Test
+    void delete_wallet_by_id_should_return_removed_id() {
+        // Create the wallet.
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("Wallet to delete", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var walletId = Objects.requireNonNull(createRes.getBody()).getId();
+
+        // Give access to the wallet to another user.
+        permissionRepository.save(permissionRepository.save(Permission.builder()
+                .id(new Permission.Id(extractUserId(registerAndGetAccessToken()), walletId))
+                .permission(WalletPermission.EDITOR)
+                .build()));
+
+        // Two permissions should exist for this wallet.
+        Assertions.assertEquals(2, permissionRepository.getAllByWalletId(walletId).size());
+
+        // Deleting the wallet should remove it correctly.
+        var deleteRes = utils.deleteWalletById(accessToken, walletId.toString());
+        Assertions.assertEquals(new DeleteWalletDTO(walletId), deleteRes);
+
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.getWalletById(accessToken, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+
+        // All permissions should have been deleted too.
+        Assertions.assertEquals(0, permissionRepository.getAllByWalletId(walletId).size());
+    }
+
+    @Test
+    void delete_wallet_by_id_with_guest_should_return_unauthorized() {
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("Wallet to delete", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var walletId = Objects.requireNonNull(createRes.getBody()).getId();
+
+        // Trying to delete without being logged should return unauthorized.
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(null, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), ex.httpStatusCode.value());
+
+        // The wallet should still exist, as well as the permission
+        Assertions.assertEquals(walletId, utils.getWalletById(accessToken, walletId.toString()).getId());
+        Assertions.assertEquals(1, permissionRepository.getAllByWalletId(walletId).size());
+    }
+
+    @Test
+    void delete_wallet_by_id_without_owner_permission_should_return_not_found() {
+        var accessToken = registerAndGetAccessToken();
+        var createRes = utils.createWallet(new CreateWalletDTO("Wallet to delete", "CHF"), accessToken);
+        Assertions.assertEquals(HttpStatus.CREATED, createRes.getStatusCode());
+        var walletId = Objects.requireNonNull(createRes.getBody()).getId();
+
+        // Trying to delete with another user without permission should return not found.
+        var user = registerAndGetAccessToken();
+        var userId = extractUserId(user);
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(user, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+
+        // Add admin permission to the new user
+        permissionRepository.save(Permission.builder()
+                .id(new Permission.Id(userId, walletId))
+                .permission(WalletPermission.ADMIN)
+                .build());
+
+        // Trying to remove with an admin user should return not found. Only owners can remove the wallet!
+        var ex2 = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(user, walletId.toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex2.httpStatusCode.value());
+
+        // The wallet should still exist, as well as the permission
+        Assertions.assertEquals(walletId, utils.getWalletById(accessToken, walletId.toString()).getId());
+        Assertions.assertEquals(2, permissionRepository.getAllByWalletId(walletId).size());
+    }
+
+    @Test
+    void delete_wallet_by_id_should_return_not_found_if_not_exist() {
+        var accessToken = registerAndGetAccessToken();
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(accessToken, UUID.randomUUID().toString())
+        );
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), ex.httpStatusCode.value());
+    }
+
+    @Test
+    void delete_wallet_by_id_should_return_bad_request_if_invalid_uuid() {
+        var accessToken = registerAndGetAccessToken();
+        var ex = Assertions.assertThrows(
+                HttpException.class,
+                () -> utils.deleteWalletById(accessToken, "Invalid-uuid")
         );
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), ex.httpStatusCode.value());
     }

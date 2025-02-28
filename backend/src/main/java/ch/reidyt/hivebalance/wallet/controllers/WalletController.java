@@ -2,6 +2,7 @@ package ch.reidyt.hivebalance.wallet.controllers;
 
 import ch.reidyt.hivebalance.security.services.AuthenticationService;
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
 import ch.reidyt.hivebalance.wallet.errors.WalletNotFoundException;
 import ch.reidyt.hivebalance.wallet.models.Wallet;
@@ -50,5 +51,13 @@ public class WalletController {
                 .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         return ResponseEntity.status(HttpStatus.OK).body(wallet);
+    }
+
+    @DeleteMapping("/{walletId}")
+    public ResponseEntity<DeleteWalletDTO> deleteWalletById(@PathVariable UUID walletId, Authentication authentication) {
+        var userId = authenticationService.getAuthenticatedUserId(authentication);
+        walletService.deleteWalletById(userId, walletId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new DeleteWalletDTO(walletId));
     }
 }

@@ -1,6 +1,7 @@
 package ch.reidyt.hivebalance.utils;
 
 import ch.reidyt.hivebalance.wallet.dtos.CreateWalletDTO;
+import ch.reidyt.hivebalance.wallet.dtos.DeleteWalletDTO;
 import ch.reidyt.hivebalance.wallet.dtos.GrantedWalletDTO;
 import ch.reidyt.hivebalance.wallet.models.Wallet;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,6 +19,7 @@ public class WalletTestUtils extends HttpTestUtils {
     private static final String CREATE_WALLET_ROUTE = "/wallets";
     private static final String GET_USER_GRANTED_WALLETS_ROUTE = "/wallets";
     private static final String GET_WALLET_ROUTE = "/wallets/%s";
+    private static final String DELETE_WALLET_ROUTE = "/wallets/%s";
 
     public WalletTestUtils(TestRestTemplate restTemplate) {
         super(restTemplate);
@@ -43,6 +45,17 @@ public class WalletTestUtils extends HttpTestUtils {
                 restTemplate,
                 String.format(GET_WALLET_ROUTE, walletId),
                 HttpMethod.GET,
+                accessToken,
+                new TypeReference<>() {
+                }
+        );
+    }
+
+    public DeleteWalletDTO deleteWalletById(String accessToken, String walletId) {
+        return exchange(
+                restTemplate,
+                String.format(DELETE_WALLET_ROUTE, walletId),
+                HttpMethod.DELETE,
                 accessToken,
                 new TypeReference<>() {
                 }

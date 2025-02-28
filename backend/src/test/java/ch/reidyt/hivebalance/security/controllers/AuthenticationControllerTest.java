@@ -56,8 +56,7 @@ public class AuthenticationControllerTest {
             "User123",
             "john_doe",
             "john-doe",
-            "john.doe",
-            "user123"
+            "john.doe"
     })
     void registration_with_valid_username_should_return_201(String validUsername) {
         var user = userUtils.userBuilder().username(validUsername).build();
@@ -294,8 +293,8 @@ public class AuthenticationControllerTest {
     void registration_with_existing_username_should_return_409() {
         var user = userUtils.createRandomUserWithStrongPassword();
         utils.registerUser(user);
-        // Same username
-        var user2 = userUtils.userBuilder().username(user.username()).build();
+        // Same username but in upper case
+        var user2 = userUtils.userBuilder().username(user.username().toUpperCase()).build();
         var res = utils.registerUser(user2);
         Assertions.assertEquals(HttpStatus.CONFLICT.value(), res.getStatusCode().value());
     }
@@ -304,8 +303,8 @@ public class AuthenticationControllerTest {
     void registration_with_existing_email_should_return_409() {
         var user = userUtils.createRandomUserWithStrongPassword();
         utils.registerUser(user);
-        // Same email
-        var user2 = userUtils.userBuilder().email(user.email()).build();
+        // Same email but in upper case
+        var user2 = userUtils.userBuilder().email(user.email().toUpperCase()).build();
         var res = utils.registerUser(user2);
         Assertions.assertEquals(HttpStatus.CONFLICT.value(), res.getStatusCode().value());
     }

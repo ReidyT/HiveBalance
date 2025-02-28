@@ -1,0 +1,22 @@
+meta {
+  name: Delete Owned Wallet By Id
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{BACKEND_URL}}/wallets/8bd303e1-35cb-410b-9f37-eeab7401fb75
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+body:json {
+  {
+    "name": "My trip to Switzerland",
+    "currencyCode": "CHF"
+  }
+}
