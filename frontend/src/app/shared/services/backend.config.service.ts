@@ -23,12 +23,23 @@ class AuthRoutes {
   }
 }
 
+class WalletRoutes {
+  public readonly walletUrl;
+  public readonly getGrantedWallets;
+
+  constructor(backendUrl: string) {
+    this.walletUrl = backendUrl + '/wallets';
+    this.getGrantedWallets = this.walletUrl;
+  }
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class BackendConfigService {
   public readonly apiUrl;
   public readonly authRoutes;
+  public readonly walletRoutes;
 
   constructor() {
     this.apiUrl = import.meta.env.NG_APP_BACKEND_URL;
@@ -38,5 +49,6 @@ export class BackendConfigService {
     }
 
     this.authRoutes = new AuthRoutes(this.apiUrl);
+    this.walletRoutes = new WalletRoutes(this.apiUrl);
   }
 }
