@@ -4,6 +4,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.security.oauth2.jwt.BadJwtException;
+import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,6 +75,26 @@ public class GlobalExceptionHandler {
         // TODO: translate
         ErrorResponse message = new ErrorResponse(
                 "MethodArgumentTypeMismatchException",
+                ex.getLocalizedMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+        return new ResponseEntity<>(message, message.getStatusCode());
+    }
+
+    @ExceptionHandler(JwtValidationException.class)
+    public ResponseEntity<ErrorResponse> handleJwtValidationException(JwtValidationException ex) {
+        ErrorResponse message = new ErrorResponse(
+                "JwtValidationException",
+                ex.getLocalizedMessage(),
+                HttpStatus.UNAUTHORIZED
+        );
+        return new ResponseEntity<>(message, message.getStatusCode());
+    }
+
+    @ExceptionHandler(BadJwtException.class)
+    public ResponseEntity<ErrorResponse> handleBadJwtException(BadJwtException ex) {
+        ErrorResponse message = new ErrorResponse(
+                "BadJwtException",
                 ex.getLocalizedMessage(),
                 HttpStatus.BAD_REQUEST
         );

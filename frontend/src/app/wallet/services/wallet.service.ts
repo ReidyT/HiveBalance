@@ -1,8 +1,7 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BackendConfigService} from '../../shared/services/backend.config.service';
 import {GrantedWalletResponseModel} from '../models/granted.wallet.response.model';
-import {tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 
 @Injectable({
@@ -14,8 +13,7 @@ export class WalletService {
 
   public getAllGrantedWallets() {
     return rxResource({
-      request: () => ({}),
-      loader: (_) =>
+      loader: () =>
         this.http.get<GrantedWalletResponseModel[]>(this.backendConfig.walletRoutes.getGrantedWallets)
     })
   }

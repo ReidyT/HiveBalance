@@ -9,7 +9,6 @@ import ch.reidyt.hivebalance.security.repositories.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +47,7 @@ public class TokenService {
     public TokensDTO generateTokenPair(Authentication authentication, String parentTokenString) {
         var refreshToken = generateToken(authentication, TokenType.REFRESH_TOKEN);
         var accessToken = generateToken(authentication, TokenType.ACCESS_TOKEN);
-        
+
         var parentToken = tokenConverter.decode(parentTokenString);
         var parentId = parentToken.map(JwtToken::getTokenId).orElse(null);
 
@@ -89,7 +88,7 @@ public class TokenService {
     public boolean isRefreshToken(String tokensString) {
         try {
             return tokenConverter.decode(tokensString).orElseThrow().getTokenType().equals(TokenType.REFRESH_TOKEN);
-        } catch (JwtException e) {
+        } catch (Exception e) {
             return false;
         }
     }

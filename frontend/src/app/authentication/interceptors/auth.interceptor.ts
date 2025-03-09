@@ -47,7 +47,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       catchError((error) => {
         // Check if the error is due to an expired access token
         if (error.status === HttpStatusCode.Unauthorized && accessToken) {
-          handleTokenExpired(req, next, authService);
+          handleTokenExpired(req, next, authService).subscribe();
         }
 
         return throwError(() => error);

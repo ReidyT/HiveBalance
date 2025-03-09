@@ -6,7 +6,6 @@ import {StackComponent} from '../shared/components/stack.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WalletService} from '../wallet/services/wallet.service';
 import {DataView} from 'primeng/dataview';
-import {NgClass} from '@angular/common';
 import {Card} from 'primeng/card';
 import {Divider} from 'primeng/divider';
 import {RouterLink} from '@angular/router';
@@ -14,19 +13,17 @@ import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [CardContainerComponent, Button, StackComponent, DataView, NgClass, Card, Divider, RouterLink],
+  imports: [CardContainerComponent, Button, StackComponent, DataView, Card, Divider, RouterLink],
   template: `
     <app-card-container>
-      @if (authService.isLoggedIn()) {
         <app-stack [gap]="3">
-          <h1>You are authenticated, some content will be added soon!</h1>
           <p-button (onClick)="logout()" [loading]="isLoading()">Log out</p-button>
 
           @if (grantedWallets.isLoading()) {
             <h2>Wallets are loading...</h2>
           } @else {
             <p-card>
-              <p-data-view #dv [value]="grantedWallets.value()">
+              <p-data-view #dv [value]="grantedWallets.value()" emptyMessage="You don't have any wallets for now, don't hesitate to create one !">
                 <ng-template #list let-items>
                   <div class="flex flex-column gap-2 p-1">
                     @for (wallet of grantedWallets.value(); track wallet.id) {
@@ -40,8 +37,6 @@ import {RouterLink} from '@angular/router';
                        </div>
                       </a>
                       <p-divider />
-                    } @empty {
-                      <h2>You don't have any wallets for now, don't hesitate to create one !</h2>
                     }
                   </div>
                 </ng-template>
@@ -49,9 +44,6 @@ import {RouterLink} from '@angular/router';
             </p-card>
           }
         </app-stack>
-      } @else {
-        <h1>You are NOT authenticated, you will be redirected to the Log In page soon...</h1>
-      }
     </app-card-container>
   `,
   styles: `

@@ -1,12 +1,14 @@
 package ch.reidyt.hivebalance.config;
 
 import ch.reidyt.hivebalance.security.filters.BlacklistTokenFilter;
+import ch.reidyt.hivebalance.security.filters.ExceptionHandlerFilter;
 import ch.reidyt.hivebalance.security.filters.RefreshTokenBlockingFilter;
 import ch.reidyt.hivebalance.security.models.BeeUserDetails;
 import ch.reidyt.hivebalance.security.services.TokenService;
 import ch.reidyt.hivebalance.user.repositories.UserRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,17 +29,23 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
 @Configuration
-@RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-    private final JwtProperties jwtProperties;
+    @Autowired
+    private JwtProperties jwtProperties;
+
+    @Qualifier("handlerExceptionResolver")
+    @Autowired
+    private HandlerExceptionResolver resolver;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -96,6 +104,7 @@ public class SpringSecurityConfig {
                 .httpBasic(c -> c.authenticationEntryPoint(new LoginAuthEntryPoint()))
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
+                .addFilterBefore(new ExceptionHandlerFilter(resolver), LogoutFilter.class)
                 .addFilterBefore(new BlacklistTokenFilter(tokenService),
                         BearerTokenAuthenticationFilter.class)
                 .addFilterBefore(new RefreshTokenBlockingFilter(tokenService, "/auth/refresh-token"),
