@@ -86,17 +86,16 @@ export class AuthenticationService {
   }
 
   public refreshAccessToken() {
-    // Call the refresh token endpoint to get a new access token
     return this.http.post<TokensModel>(this.backendConfig.authRoutes.refreshAccessTokenUrl, null).pipe(
       tap((tokens) => this.setTokens(tokens)),
       map((tokens) => tokens.access_token),
-      catchError(async (error) => {
+      catchError((error) => {
         if (error.status === HttpStatusCode.Unauthorized) {
-          // Handle refresh token error (e.g., redirect to login page)
-          console.error('Error refreshing access token:', error);
+          console.error('Refresh token is invalid or expired. Logging out.', error);
           this.clearTokens();
-          await this.router.navigate(['/login']);
+          this.router.navigate(['/login']); // Initiate navigation
         }
+        // Propagate the error to stop the request chain
         return throwError(() => error);
       })
     );

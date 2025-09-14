@@ -13,30 +13,57 @@ import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [CardContainerComponent, Button, StackComponent, DataView, Card, Divider, RouterLink],
+  imports: [
+    CardContainerComponent,
+    Button,
+    StackComponent,
+    DataView,
+    Card,
+    Divider,
+    RouterLink,
+  ],
   template: `
     <app-card-container>
+      <div class="home-content-wrapper">
         <app-stack [gap]="3">
-          <p-button (onClick)="logout()" [loading]="isLoading()">Log out</p-button>
+          <div class="flex justify-content-end">
+            <p-button
+              (onClick)="logout()"
+              [loading]="isLoading()"
+              label="Log out"
+              icon="pi pi-sign-out"
+            ></p-button>
+          </div>
 
           @if (grantedWallets.isLoading()) {
-            <h2>Wallets are loading...</h2>
+            <div class="flex justify-content-center">
+              <h3 class="text-color-secondary">Loading wallets...</h3>
+            </div>
           } @else {
-            <p-card>
-              <p-data-view #dv [value]="grantedWallets.value()" emptyMessage="You don't have any wallets for now, don't hesitate to create one !">
-                <ng-template #list let-items>
-                  <div class="flex flex-column gap-2 p-1">
-                    @for (wallet of grantedWallets.value(); track wallet.id) {
-                      <a [routerLink]="'/wallets/' + wallet.id">
-                       <div class="wallet-card flex flex-row justify-content-between align-items-baseline p-2">
-                         <div class="flex flex-row align-items-baseline gap-2">
-                           <div class="text-4xl font-medium">🛍️</div>
-                           <div class="text-lg font-medium"><p>{{ wallet.name }}</p></div>
-                         </div>
-                         <i class="pi pi-angle-right" style="font-size: 1.2rem"></i>
-                       </div>
+            <p-card header="My Wallets" class="wallets-card">
+              <p-data-view
+                [value]="grantedWallets.value()"
+                layout="list"
+                emptyMessage="🚫 You don't have any wallets yet. Why not create one?"
+              >
+                <ng-template #list let-wallets>
+                  <div class="wallet-list">
+                    @for (wallet of grantedWallets.value(); let last = $last; track wallet.id) {
+                      <a [routerLink]="'/wallets/' + wallet.id" class="wallet-link">
+                        <div class="wallet-card p-4">
+                          <div class="wallet-card-content">
+                            <div class="flex align-items-center gap-3">
+                              <div class="emoji">🛍️</div>
+                              <div class="wallet-name">{{ wallet.name }}</div>
+                            </div>
+                            <i class="pi pi-angle-right text-secondary"></i>
+                          </div>
+                        </div>
                       </a>
-                      <p-divider />
+
+                      @if (!last) {
+                        <p-divider />
+                      }
                     }
                   </div>
                 </ng-template>
@@ -44,26 +71,86 @@ import {RouterLink} from '@angular/router';
             </p-card>
           }
         </app-stack>
+      </div>
     </app-card-container>
   `,
   styles: `
+    .home-content-wrapper {
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
     .wallet-card {
-      border-radius: 8px;
+      background-color: var(--p-surface-card, #1e1e1e); /* Dark card for dark theme */
+      border-radius: 12px;
+      transition: background 0.3s, transform 0.2s;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      padding: 1.25rem;
     }
 
-  .wallet-card:hover {
-    background: var(--p-surface-600);
-    cursor: pointer;
-
-    i, p {
-      color: var(--p-surface-100);
+    .wallet-card:hover {
+      background-color: var(--p-surface-600, #2c2c2c);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
-  }
 
-  a {
-    text-decoration: none;
-    color: var(--p-text-color);
-  }
+    .wallet-card-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .wallet-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--p-text-color, #ffffff);
+    }
+
+    .emoji {
+      font-size: 1.8rem;
+    }
+
+    .wallets-card {
+      border: none;
+      box-shadow: none;
+      background-color: transparent;
+    }
+
+    .wallet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .wallet-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    @media screen and (max-width: 600px) {
+      .home-content-wrapper {
+        padding: 0 1rem;
+      }
+
+      .wallet-name {
+        font-size: 1.1rem;
+      }
+
+      .emoji {
+        font-size: 1.5rem;
+      }
+
+      .wallet-card {
+        min-height: 80px;
+        padding: 1rem;
+      }
+    }
   `,
 })
 export class HomeComponent {
@@ -76,7 +163,9 @@ export class HomeComponent {
 
   protected logout() {
     this.isLoading.set(true);
-    this.authService.logout().pipe(takeUntilDestroyed(this.destroyRef))
+    this.authService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         error: _ => this.isLoading.set(false),
       });

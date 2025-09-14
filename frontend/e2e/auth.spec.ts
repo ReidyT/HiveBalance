@@ -24,7 +24,7 @@ test('guest user should register or log in to access protected home', async ({pa
   )).status()).toBe(201);
 
   // The user should be redirected to the home page.
-  await expect(page.getByText("You are authenticated, some content will be added soon!")).toBeInViewport();
+  await expect(page.getByText("My Wallets")).toBeInViewport();
   expect((new URL(page.url()).pathname)).toBe('/');
 
   // Logout the user should redirect it to the login page.
@@ -46,7 +46,7 @@ test('guest user should register or log in to access protected home', async ({pa
   )).status()).toBe(201);
 
   // The user should be redirected to the home page.
-  await expect(page.getByText("You are authenticated, some content will be added soon!")).toBeInViewport();
+  await expect(page.getByText("My Wallets")).toBeInViewport();
   expect((new URL(page.url()).pathname)).toBe('/');
 
   // Logout the user should redirect to the login page.
@@ -55,6 +55,6 @@ test('guest user should register or log in to access protected home', async ({pa
   expect((await page.waitForResponse((response) =>
     response.url().includes('/auth/logout')
   )).status()).toBe(200);
-  await expect(page.getByText("You are authenticated, some content will be added soon!")).not.toBeInViewport();
+  await expect(page.getByText("My Wallets")).not.toBeInViewport();
   expect((new URL(page.url()).pathname)).toBe('/login');
 });
