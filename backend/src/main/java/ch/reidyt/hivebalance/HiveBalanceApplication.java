@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class HiveBalanceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HiveBalanceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HiveBalanceApplication.class, args);
+    }
 
 }
