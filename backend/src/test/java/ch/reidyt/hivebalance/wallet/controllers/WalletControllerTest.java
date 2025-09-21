@@ -173,9 +173,20 @@ class WalletControllerTest {
         }
 
         // Only the wallets of u1 should be returned
-        var res = utils.getUserGrantedWallets(u1).stream().map(GrantedWalletDTO::name).toList();
-        Assertions.assertEquals(res, Arrays.stream(wallets_u1).map(CreateWalletDTO::name).toList());
-        Assertions.assertNotEquals(res, Arrays.stream(wallets_u2).map(CreateWalletDTO::name).toList());
+        var res = utils.getUserGrantedWallets(u1).stream()
+                .map(GrantedWalletDTO::name)
+                .sorted()
+                .toList();
+        var expectedU1 = Arrays.stream(wallets_u1)
+                .map(CreateWalletDTO::name)
+                .sorted()
+                .toList();
+        var expectedU2 = Arrays.stream(wallets_u2)
+                .map(CreateWalletDTO::name)
+                .sorted()
+                .toList();
+        Assertions.assertEquals(expectedU1, res);
+        Assertions.assertNotEquals(expectedU2, res);
     }
 
     @Test
