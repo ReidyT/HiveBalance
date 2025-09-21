@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {BackendConfigService} from '../../shared/services/backend.config.service';
 import {GrantedWalletResponseModel} from '../models/granted.wallet.response.model';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {CreateWalletRequestModel} from '../models/create.wallet.request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,5 +17,12 @@ export class WalletService {
       loader: () =>
         this.http.get<GrantedWalletResponseModel[]>(this.backendConfig.walletRoutes.getGrantedWallets)
     })
+  }
+
+  public createWallet(data: CreateWalletRequestModel) {
+    return this.http.post<void>(
+      this.backendConfig.walletRoutes.createWallet,
+      data
+    );
   }
 }

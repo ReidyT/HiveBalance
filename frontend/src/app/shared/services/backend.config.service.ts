@@ -26,10 +26,22 @@ class AuthRoutes {
 class WalletRoutes {
   public readonly walletUrl;
   public readonly getGrantedWallets;
+  public readonly createWallet;
 
   constructor(backendUrl: string) {
     this.walletUrl = backendUrl + '/wallets';
     this.getGrantedWallets = this.walletUrl;
+    this.createWallet = this.walletUrl;
+  }
+}
+
+class CurrencyRoutes {
+  public readonly currencyUrl;
+  public readonly getAllCurrencies;
+
+  constructor(backendUrl: string) {
+    this.currencyUrl = backendUrl + '/currencies';
+    this.getAllCurrencies = this.currencyUrl;
   }
 }
 
@@ -40,6 +52,7 @@ export class BackendConfigService {
   public readonly apiUrl;
   public readonly authRoutes;
   public readonly walletRoutes;
+  public readonly currencyRoutes;
 
   constructor() {
     this.apiUrl = import.meta.env.NG_APP_BACKEND_URL;
@@ -50,5 +63,6 @@ export class BackendConfigService {
 
     this.authRoutes = new AuthRoutes(this.apiUrl);
     this.walletRoutes = new WalletRoutes(this.apiUrl);
+    this.currencyRoutes = new CurrencyRoutes(this.apiUrl);
   }
 }

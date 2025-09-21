@@ -9,6 +9,7 @@ import {DataView} from 'primeng/dataview';
 import {Card} from 'primeng/card';
 import {Divider} from 'primeng/divider';
 import {RouterLink} from '@angular/router';
+import {NewWalletModalComponent} from '../wallet/components/new-wallet-modal.component';
 
 
 @Component({
@@ -21,17 +22,25 @@ import {RouterLink} from '@angular/router';
     Card,
     Divider,
     RouterLink,
+    NewWalletModalComponent,
   ],
   template: `
     <app-card-container>
       <div class="home-content-wrapper">
         <app-stack [gap]="3">
-          <div class="flex justify-content-end">
+          <div class="flex justify-content-end gap-3">
+            <p-button
+              (onClick)="showCreateWallet = true"
+              label="New Wallet"
+              icon="pi pi-wallet"
+            ></p-button>
+
             <p-button
               (onClick)="logout()"
               [loading]="isLoading()"
               label="Log out"
               icon="pi pi-sign-out"
+              severity="danger"
             ></p-button>
           </div>
 
@@ -70,6 +79,12 @@ import {RouterLink} from '@angular/router';
               </p-data-view>
             </p-card>
           }
+
+          <app-new-wallet-modal
+            [(visible)]="showCreateWallet"
+            (walletCreated)="handleWalletCreated($event)">
+          </app-new-wallet-modal>
+
         </app-stack>
       </div>
     </app-card-container>
@@ -79,6 +94,7 @@ import {RouterLink} from '@angular/router';
       max-width: 640px;
       margin: 0 auto;
       width: 100%;
+      max-height: 100%;
     }
 
     .wallet-card {
@@ -158,6 +174,7 @@ export class HomeComponent {
   protected authService = inject(AuthenticationService);
   protected walletService = inject(WalletService);
   protected grantedWallets = this.walletService.getAllGrantedWallets();
+  protected showCreateWallet = false;
 
   private destroyRef = inject(DestroyRef);
 
@@ -169,5 +186,11 @@ export class HomeComponent {
       .subscribe({
         error: _ => this.isLoading.set(false),
       });
+  }
+
+  protected handleWalletCreated(succeeded: boolean) {
+    if (succeeded) {
+      this.grantedWallets.reload();
+    }
   }
 }

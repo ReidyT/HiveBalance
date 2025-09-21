@@ -18,6 +18,7 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
             FROM Permission p
             INNER JOIN FETCH Wallet w ON p.wallet.id = w.id
             WHERE p.beeUser.id = :userId
+            ORDER BY p.wallet.createdAt DESC
             """)
     List<GrantedWalletDTO> findAllGrantedWalletsByUserId(@Param("userId") UUID userId);
 
