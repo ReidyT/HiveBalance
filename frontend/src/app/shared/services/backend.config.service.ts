@@ -19,7 +19,7 @@ class AuthRoutes {
     this.registrationUrl = this.authUrl + '/register';
     this.loginUrl = this.authUrl + '/login';
     this.logoutUrl = this.authUrl + '/logout';
-    this.refreshAccessTokenUrl = this.authUrl + '/refresh_token';
+    this.refreshAccessTokenUrl = this.authUrl + '/refresh-token';
   }
 }
 

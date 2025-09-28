@@ -138,6 +138,9 @@ describe('AuthenticationService', () => {
 
   describe('refreshAccessToken', () => {
     it('should refresh the access token', () => {
+      // Access token is null (or expired), but the user should already have a refresh token!
+      (service as any).refreshToken.set('oldRefreshToken');
+
       const mockTokens: TokensModel = {access_token: 'newAccessToken', refresh_token: 'newRefreshToken'};
 
       service.refreshAccessToken().subscribe(token => {
@@ -150,6 +153,9 @@ describe('AuthenticationService', () => {
     });
 
     it('should handle unauthorized refresh and redirect to login', () => {
+      // Access token is null (or expired), but the user should already have a refresh token!
+      (service as any).refreshToken.set('oldRefreshToken');
+
       const errorResponse = new HttpErrorResponse({status: HttpStatusCode.Unauthorized, statusText: 'Unauthorized'});
 
       service.refreshAccessToken().subscribe({
