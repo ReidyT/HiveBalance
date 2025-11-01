@@ -28,8 +28,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     <app-card-container data-testid="login-card">
       <p-card class="w-20rem md:w-30rem">
         <ng-template #header>
-          <img alt="HiveBalance Logo" class="w-full md:h-20rem" src="/assets/hive_balance_logo.svg"
-               height="200px"/>
+          <img alt="HiveBalance Logo" class="w-full" src="/assets/hive_balance_logo.png" />
         </ng-template>
         <ng-template #title>Welcome back !</ng-template>
         <ng-template #subtitle>Don't have an account? <a routerLink="/signUp">Sign Up</a>
