@@ -1,6 +1,6 @@
 # HiveBalance: Honeycomb your finances, effortlessly.
 
-![HiveBalance Logo Placeholder](docs/assets/hive_balance_logo.png)
+<img src="docs/assets/hive_balance_logo.png" alt="HiveBalance Logo" width="400" />
 
 **HiveBalance** is a web app designed to make managing shared expenses easy and efficient. Organize your finances, track who owes whom, and simplify shared costs. Bee smart with shared expenses.
 
@@ -18,4 +18,5 @@ The following items are the major targets for HiveBalance's first stable release
 - [ ] 📡 **Offline & Sync:** Track expenses offline with automatic syncing.
 - [ ] 📂 **Wallet Archiving:** Archive old wallets while retaining history.
 - [ ] 🔔 **Payment Reminders:** Set up payment notifications.
+
 - [ ] 📎 **File attachments:** Attach files to expenses.
