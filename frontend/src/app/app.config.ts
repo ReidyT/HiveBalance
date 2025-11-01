@@ -15,7 +15,12 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, globalErrorInterceptor])),
+    // The order of interceptors is critical for the error handling flow.
+    // For outgoing requests, they run in the provided order: global -> auth.
+    // For incoming responses (and errors), they run in REVERSE order: auth -> global.
+    // This allows the authInterceptor to catch 401 errors and attempt a token
+    // refresh before the globalErrorInterceptor tries to display a generic error message.
+    provideHttpClient(withInterceptors([globalErrorInterceptor, authInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
