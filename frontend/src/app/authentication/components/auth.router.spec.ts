@@ -41,28 +41,28 @@ describe('AuthenticationRouter', () => {
   });
 
   it('should display login page when navigating by url', async () => {
-    await setup({initialUrl: '/login'});
+    await setup({initialUrl: '/auth/login'});
     expect(screen.getByTestId('login-card')).toBeTruthy();
   });
 
   it('should display sign up page when navigating by url', async () => {
-    await setup({initialUrl: '/signUp'});
+    await setup({initialUrl: '/auth/signUp'});
     expect(screen.getByTestId('registration-card')).toBeTruthy();
   });
 
   it('should navigate to sign up page when clicking on the link from login page', fakeAsync(async () => {
-    const {clickLink} = await setup({initialUrl: '/login'});
+    const {clickLink} = await setup({initialUrl: '/auth/login'});
     clickLink(screen.getByRole('link', {name: /sign up/i}));
 
-    expect(TestBed.inject(Router).url).toBe('/signUp');
+    expect(TestBed.inject(Router).url).toBe('/auth/signUp');
     expect(screen.getByTestId('registration-card')).toBeTruthy();
   }));
 
   it('should navigate to log in page when clicking on the link from sign up page', fakeAsync(async () => {
-    const {clickLink} = await setup({initialUrl: '/signUp'});
+    const {clickLink} = await setup({initialUrl: '/auth/signUp'});
     clickLink(screen.getByRole('link', {name: /log in/i}));
 
-    expect(TestBed.inject(Router).url).toBe('/login');
+    expect(TestBed.inject(Router).url).toBe('/auth/login');
     expect(screen.getByTestId('login-card')).toBeTruthy();
   }));
 });

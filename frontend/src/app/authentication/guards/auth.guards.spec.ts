@@ -28,11 +28,11 @@ describe('authGuard', () => {
     expect(executeGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot)).toBeTrue();
   });
 
-  it('should redirect to /login if user is not logged in', () => {
+  it('should redirect to /auth/login if user is not logged in', () => {
     authService.isLoggedIn.and.returnValue(false);
 
     executeGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot);
 
-    expect(routerSpy.parseUrl).toHaveBeenCalledWith('/login');
+    expect(routerSpy.parseUrl).toHaveBeenCalledWith('/auth/login');
   });
 });
