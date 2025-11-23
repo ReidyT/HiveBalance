@@ -4,14 +4,26 @@ import {Component} from '@angular/core';
   selector: 'app-container',
   imports: [],
   template: `
-    <div class="container">
+    <div class="container-wrapper">
       <ng-content></ng-content>
     </div>
   `,
   styles: `
-    .container {
-      padding: 20px;
+    :host {
+      display: block;
       height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .container-wrapper {
+      height: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+
+      display: flex;
+      flex-direction: column;
     }
   `
 })

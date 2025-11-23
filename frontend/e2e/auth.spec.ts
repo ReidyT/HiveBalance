@@ -28,7 +28,7 @@ test('guest user should register or log in to access protected home', async ({pa
   expect((new URL(page.url()).pathname)).toBe('/');
 
   // Logout the user should redirect it to the login page.
-  await page.getByRole("button", {name: "Log out"}).click();
+  await page.locator("[data-testid = 'button-logout']").click();
 
   // Ensure the server responded with a 201 Created.
   expect((await page.waitForResponse((response) =>
@@ -50,11 +50,11 @@ test('guest user should register or log in to access protected home', async ({pa
   expect((new URL(page.url()).pathname)).toBe('/');
 
   // Logout the user should redirect to the login page.
-  await page.getByRole("button", {name: "Log out"}).click();
+  await page.locator("[data-testid = 'button-logout']").click();
   // Ensure the server responded with a 201 Created.
   expect((await page.waitForResponse((response) =>
     response.url().includes('/auth/logout')
   )).status()).toBe(200);
   await expect(page.getByText("My Wallets")).not.toBeInViewport();
-  expect((new URL(page.url()).pathname)).toBe('/login');
+  expect((new URL(page.url()).pathname)).toBe('/auth/login');
 });

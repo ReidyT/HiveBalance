@@ -115,7 +115,7 @@ describe('AuthenticationService', () => {
   });
 
   describe('logout', () => {
-    it('should log out user and navigate to /login', () => {
+    it('should log out user and navigate to /auth/login', () => {
       spyOn(service, 'isLoggedIn').and.returnValue(true);
 
       service.logout().subscribe(success => {
@@ -126,7 +126,7 @@ describe('AuthenticationService', () => {
       expect(req.request.method).toBe('POST');
       req.flush(null);
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
     });
 
     it('should throw an error if user is not logged in', () => {
@@ -161,7 +161,7 @@ describe('AuthenticationService', () => {
       service.refreshAccessToken().subscribe({
         error: async error => {
           expect(error.status).toBe(HttpStatusCode.Unauthorized);
-          expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+          expect(routerSpy.navigate).toHaveBeenCalledWith(['/auth/login']);
         }
       });
 

@@ -98,7 +98,7 @@ import {MessageService} from 'primeng/api';
 export class NewWalletModalComponent {
   @Input() visible: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
-  @Output() walletCreated = new EventEmitter<boolean>();
+  @Output() walletCreated = new EventEmitter<string|null>();
 
   protected currencyService = inject(CurrencyService);
   protected walletService = inject(WalletService);
@@ -122,9 +122,9 @@ export class NewWalletModalComponent {
       name: this.wallet.name,
       currencyCode: this.wallet.currency?.value ?? '',
     }).subscribe({
-      next: () => {
+      next: (res) => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Wallet created successfully' });
-        this.walletCreated.emit(true);
+        this.walletCreated.emit(res.id);
         this.resetForm();
         this.onClose();
       }

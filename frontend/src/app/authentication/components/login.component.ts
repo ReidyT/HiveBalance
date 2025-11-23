@@ -31,7 +31,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
           <img alt="HiveBalance Logo" class="w-full" src="/assets/hive_balance_logo.png" />
         </ng-template>
         <ng-template #title>Welcome back !</ng-template>
-        <ng-template #subtitle>Don't have an account? <a routerLink="/signUp">Sign Up</a>
+        <ng-template #subtitle>Don't have an account? <a routerLink="/auth/signUp">Sign Up</a>
         </ng-template>
         <form [formGroup]="loginForm" (submit)="login()">
           <app-stack [gap]="3">

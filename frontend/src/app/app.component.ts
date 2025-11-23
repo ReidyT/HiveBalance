@@ -12,6 +12,19 @@ import {Toast} from 'primeng/toast';
       <router-outlet/>
     </app-container>
   `,
+  styles: `
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden; /* Prevents the window itself from scrolling */
+      box-sizing: border-box;
+    }
+
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+  `
 })
 export class AppComponent {
 }
