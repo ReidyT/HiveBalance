@@ -29,7 +29,7 @@ test('user should create a new wallet successfully', async ({ page }) => {
   expect((new URL(page.url()).pathname)).toBe('/');
 
   // ----- STEP 2: Open New Wallet Modal -----
-  await page.getByRole('button', { name: /new wallet/i }).click();
+  await page.locator("[data-testid = 'button-new-wallet']").click();
   await expect(page.getByRole('dialog')).toBeVisible();
 
   // ----- STEP 3: Fill out wallet form -----

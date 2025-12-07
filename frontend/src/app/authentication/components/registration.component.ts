@@ -27,7 +27,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
           <img alt="HiveBalance Logo" class="w-full" src="/assets/hive_balance_logo.png" />
         </ng-template>
         <ng-template #title>Create an account</ng-template>
-        <ng-template #subtitle>Already have an account? <a routerLink="/login">Log in</a></ng-template>
+        <ng-template #subtitle>Already have an account? <a routerLink="/auth/login">Log in</a></ng-template>
 
         <form [formGroup]="registrationForm" (submit)="register()">
           <app-stack [gap]="3">

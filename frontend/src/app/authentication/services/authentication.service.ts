@@ -79,7 +79,7 @@ export class AuthenticationService {
 
     return this.http.post<void>(this.backendConfig.authRoutes.logoutUrl, null).pipe(
       tap(() => this.clearTokens()),
-      tap(() => this.router.navigate(['/login'])), // Navigate on success
+      tap(() => this.router.navigate(['/auth/login'])), // Navigate on success
       map(() => true), // Signal success
       catchError(error => {
         console.error('Logout failed:', error);
@@ -127,7 +127,7 @@ export class AuthenticationService {
           if (error.status === HttpStatusCode.Unauthorized) {
             console.error('Refresh token is invalid or expired. Logging out.', error);
             this.clearTokens();
-            this.router.navigate(['/login']); // Initiate navigation
+            this.router.navigate(['/auth/login']); // Initiate navigation
           }
           // Propagate the error to stop the request chain
           return throwError(() => error);

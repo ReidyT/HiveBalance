@@ -4,6 +4,7 @@ import {BackendConfigService} from '../../shared/services/backend.config.service
 import {GrantedWalletResponseModel} from '../models/granted.wallet.response.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {CreateWalletRequestModel} from '../models/create.wallet.request.model';
+import {CreateWalletResponseModel} from '../models/create.wallet.response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,7 @@ export class WalletService {
   }
 
   public createWallet(data: CreateWalletRequestModel) {
-    return this.http.post<void>(
+    return this.http.post<CreateWalletResponseModel>(
       this.backendConfig.walletRoutes.createWallet,
       data
     );
