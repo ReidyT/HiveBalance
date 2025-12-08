@@ -31,7 +31,7 @@ import {WalletEditData} from './edit-wallet-modal/wallet.edit.data';
       <span class="text-primary font-bold">{{ item.label }}</span>
     </ng-template>
     <ng-template #item let-item>
-      <a pRipple class="flex items-center p-menu-item-link">
+      <a pRipple class="flex items-center p-menu-item-link" [attr.data-testid]="item.testId || null">
         <span [class]="item.icon"></span>
         <span class="ml-2">{{ item.label }}</span>
         <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge"/>
@@ -85,6 +85,7 @@ export class WalletDetailsMenuComponent {
             command: () => {
               this.showEditWallet = true;
             },
+            testId: 'wallet-edit-settings'
           },
         ]
       },
