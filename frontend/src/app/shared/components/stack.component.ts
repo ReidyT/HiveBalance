@@ -23,6 +23,16 @@ interface Breakpoint {
     .fluid {
       width: 100%;
     }
+
+    .v-center {
+      align-items: center;
+      height: 100%; // TODO: fix this
+    }
+
+    .h-center {
+      width: 100%;
+      justify-content: center;
+    }
   `
 })
 export class StackComponent {
@@ -30,14 +40,18 @@ export class StackComponent {
   public breakpoints = input<Breakpoint>({});
   public gap = input<number>(0);
   public fluid = input<boolean>(false);
+  public vCenter = input<boolean>(false);
+  public hCenter = input<boolean>(false);
   protected classes = computed(() => ([
-      `flex`,
-      `flex-${this.direction()}`,
-      `gap-${this.gap()}`,
-      this.fluid() ? 'fluid' : '',
-      ...Object.entries(this.breakpoints()).flatMap(([k, v]) =>
-        (v as string[]).flatMap((cls) => `${k}:${cls}`)
-      )
+    `flex`,
+    `flex-${this.direction()}`,
+    `gap-${this.gap()}`,
+    this.fluid() ? 'fluid' : '',
+    this.vCenter() ? 'v-center' : '',
+    this.hCenter() ? 'h-center' : '',
+    ...Object.entries(this.breakpoints()).flatMap(([k, v]) =>
+      (v as string[]).flatMap((cls) => `${k}:${cls}`)
+    )
     ].filter((c) => Boolean(c)))
   );
 }

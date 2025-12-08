@@ -1,5 +1,5 @@
 import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter} from '@angular/router';
+import {provideRouter, withComponentInputBinding} from '@angular/router';
 
 import {routes} from './app.routes';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     MessageService,
     provideZoneChangeDetection({eventCoalescing: true}),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     // The order of interceptors is critical for the error handling flow.
     // For outgoing requests, they run in the provided order: global -> auth.
     // For incoming responses (and errors), they run in REVERSE order: auth -> global.

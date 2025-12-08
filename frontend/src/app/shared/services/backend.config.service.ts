@@ -33,6 +33,14 @@ class WalletRoutes {
     this.getGrantedWallets = this.walletUrl;
     this.createWallet = this.walletUrl;
   }
+
+  public getWalletDetails(walletId: string) {
+    return `${this.walletUrl}/${walletId}`;
+  }
+
+  public patchWallet(walletId: string) {
+    return `${this.walletUrl}/${walletId}`;
+  }
 }
 
 class CurrencyRoutes {

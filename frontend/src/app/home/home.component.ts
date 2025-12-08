@@ -6,7 +6,8 @@ import {Divider} from 'primeng/divider';
 import {RouterLink} from '@angular/router';
 import {Button} from 'primeng/button';
 import {NewWalletModalComponent} from '../wallet/components/new-wallet-modal.component';
-
+import {LoaderComponent} from '../shared/components/loader.component';
+import {StackComponent} from '../shared/components/stack.component';
 
 @Component({
   selector: 'app-home',
@@ -17,62 +18,62 @@ import {NewWalletModalComponent} from '../wallet/components/new-wallet-modal.com
     RouterLink,
     Button,
     NewWalletModalComponent,
+    LoaderComponent,
+    StackComponent,
   ],
   template: `
     <div class="home-content-wrapper">
-      @if (grantedWallets.isLoading()) {
-        <div class="flex justify-content-center">
-          <h3 class="text-color-secondary">Loading wallets...</h3>
-        </div>
-      } @else {
+      <app-loader [isLoading]="!grantedWallets.hasValue() && grantedWallets.isLoading()">
         <p-card header="My Wallets" styleClass="full-height-card" class="wallets-card h-full">
           <div class="scrollable-list-wrapper">
+            @if (grantedWallets.hasValue()) {
               <p-data-view
-            [value]="grantedWallets.value()"
-            layout="list"
-            emptyMessage="🚫 You don't have any wallets yet. Why not create one?"
-          >
-            <ng-template #list let-wallets>
-              <div class="wallet-list">
-                @for (wallet of grantedWallets.value(); let last = $last; track wallet.id) {
-                  <a [routerLink]="'/wallets/' + wallet.id" class="wallet-link">
-                    <div class="wallet-card p-4">
-                      <div class="wallet-card-content">
-                        <div class="flex align-items-center gap-3">
-                          <div class="emoji">🛍️</div>
-                          <div class="wallet-name">{{ wallet.name }}</div>
+                [value]="grantedWallets.value()"
+                layout="list"
+              >
+                <ng-template #list let-wallets>
+                  <div class="wallet-list">
+                    @for (wallet of grantedWallets.value(); let last = $last; track wallet.id) {
+                      <a [routerLink]="'/wallets/' + wallet.id" class="wallet-link">
+                        <div class="wallet-card p-4">
+                          <div class="wallet-card-content">
+                            <div class="flex align-items-center gap-3">
+                              <div class="emoji">🛍️</div>
+                              <div class="wallet-name">{{ wallet.name }}</div>
+                            </div>
+                            <i class="pi pi-angle-right text-secondary"></i>
+                          </div>
                         </div>
-                        <i class="pi pi-angle-right text-secondary"></i>
-                      </div>
-                    </div>
-                  </a>
+                      </a>
 
-                  @if (!last) {
-                    <p-divider />
-                  }
-                }
-              </div>
-            </ng-template>
-          </p-data-view>
+                      @if (!last) {
+                        <p-divider />
+                      }
+                    }
+                  </div>
+                </ng-template>
+              </p-data-view>
+            } @else {
+              <app-stack [vCenter]="true" [hCenter]="true">
+                <p style="text-align: center">You don't have any wallets yet. Why not create one?<br>Use the + button to create a new wallet.</p>
+              </app-stack>
+            }
           </div>
         </p-card>
-      }
 
-      <p-button
-        data-testid="button-new-wallet"
-        icon="pi pi-plus"
-        [rounded]="true"
-        [raised]="true"
-        (onClick)="showCreateWallet = true"
-        size="large"
-        class="fab-btn">
-      </p-button>
+        <p-button
+          data-testid="button-new-wallet"
+          icon="pi pi-plus"
+          [rounded]="true"
+          [raised]="true"
+          (onClick)="showCreateWallet = true"
+          size="large"
+          class="fab-btn">
+        </p-button>
+      </app-loader>
 
       <!-- TODO: reuse one modal -->
-      <app-new-wallet-modal
-        [(visible)]="showCreateWallet"
-        (walletCreated)="handleWalletCreated($event)">
-      </app-new-wallet-modal>
+      <app-new-wallet-modal [(visible)]="showCreateWallet" />
     </div>
   `,
   styles: `
@@ -202,12 +203,6 @@ import {NewWalletModalComponent} from '../wallet/components/new-wallet-modal.com
 })
 export class HomeComponent {
   protected walletService = inject(WalletService);
-  protected grantedWallets = this.walletService.getAllGrantedWallets();
+  protected grantedWallets = this.walletService.grantedWallets;
   protected showCreateWallet = false;
-
-  protected handleWalletCreated(walletId: string|null) {
-    if (walletId) {
-      this.grantedWallets.reload();
-    }
-  }
 }
