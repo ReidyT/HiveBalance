@@ -29,3 +29,9 @@ export function generateUsername(maxUsernameLength: number = 15) {
   console.log("Generated username: " + u);
   return u;
 }
+
+export function generateWalletName(maxLength: number = 30) {
+  const s = generateString(() => faker.word.sample({length: {min: 2, max: maxLength} }), maxLength);
+  console.log("Generated wallet: " + s);
+  return s;
+}
