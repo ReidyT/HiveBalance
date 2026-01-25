@@ -1999,7 +1999,7 @@ export const HiveBalancePreset = definePreset(Aura, {
         color: "{content.color}",
         borderColor: "transparent",
         borderWidth: "0",
-        padding: "0",
+        padding: "10px",
         borderRadius: "0"
       },
       footer: {
@@ -2089,7 +2089,9 @@ export const HiveBalancePreset = definePreset(Aura, {
       dropPoint: {
         color: "{primary.color}"
       },
-      columnResizerWidth: "0.5rem",
+      columnResizer: {
+        width: "0.5rem"
+      },
       resizeIndicator: {
         width: "1px",
         color: "{primary.color}"
@@ -4054,12 +4056,16 @@ export const HiveBalancePreset = definePreset(Aura, {
       colorScheme: {
         light: {
           handle: {
-            contentBackground: "{surface.0}"
+            content: {
+              background: "{surface.0}"
+            }
           }
         },
         dark: {
           handle: {
-            contentBackground: "{surface.950}"
+            content: {
+              background: "{surface.950}"
+            }
           }
         }
       }
@@ -4579,8 +4585,6 @@ export const HiveBalancePreset = definePreset(Aura, {
         disabledColor: "{form.field.disabled.color}"
       },
       content: {
-        left: "0.25rem",
-        top: "0.25rem",
         checkedShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.02), 0px 1px 2px 0px rgba(0, 0, 0, 0.04)"
       },
       colorScheme: {
@@ -4880,7 +4884,9 @@ export const HiveBalancePreset = definePreset(Aura, {
         borderWidth: "0 0 1px 0",
         padding: "0.75rem 1rem"
       },
-      columnResizerWidth: "0.5rem",
+      columnResizer: {
+        width: "0.5rem"
+      },
       resizeIndicator: {
         width: "1px",
         color: "{primary.color}"
@@ -4976,7 +4982,6 @@ export const HiveBalancePreset = definePreset(Aura, {
       },
       colorScheme: {
         light: {
-          blur: "1.5px",
           info: {
             background: "color-mix(in srgb, {blue.50}, transparent 5%)",
             borderColor: "{blue.200}",
@@ -5063,7 +5068,6 @@ export const HiveBalancePreset = definePreset(Aura, {
           }
         },
         dark: {
-          blur: "10px",
           info: {
             background: "color-mix(in srgb, {blue.500}, transparent 84%)",
             borderColor: "color-mix(in srgb, {blue.700}, transparent 64%)",

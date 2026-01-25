@@ -13,7 +13,7 @@ export class CurrencyService {
 
   public getAllCurrencies() {
     return rxResource({
-      loader: () =>
+      stream: () =>
         this.http.get<CurrencyResponseModel[]>(this.backendConfig.currencyRoutes.getAllCurrencies)
     })
   }

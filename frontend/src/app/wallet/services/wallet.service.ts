@@ -18,7 +18,7 @@ export class WalletService {
   private readonly activeWalletId = signal<string | null>(null);
 
   public readonly grantedWallets = rxResource({
-    loader: () =>
+    stream: () =>
       this.http.get<GrantedWalletResponseModel[]>(this.backendConfig.walletRoutes.getGrantedWallets)
   });
 
@@ -30,14 +30,14 @@ export class WalletService {
   }
 
   public readonly walletDetails = rxResource({
-    request: () => ({ id: this.activeWalletId() }),
-    loader: ({ request }) => {
-      if (!request.id) {
+    params: () => ({ id: this.activeWalletId() }),
+    stream: ({ params }) => {
+      if (!params.id) {
         return of(null);
       }
 
       return this.http.get<WalletDetailsResponseModel>(
-        this.backendConfig.walletRoutes.getWalletDetails(request.id)
+        this.backendConfig.walletRoutes.getWalletDetails(params.id)
       );
     }
   });

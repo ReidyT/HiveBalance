@@ -2,7 +2,6 @@ import {Component, inject} from '@angular/core';
 import {WalletService} from '../wallet/services/wallet.service';
 import {DataView} from 'primeng/dataview';
 import {Card} from 'primeng/card';
-import {Divider} from 'primeng/divider';
 import {RouterLink} from '@angular/router';
 import {Button} from 'primeng/button';
 import {NewWalletModalComponent} from '../wallet/components/new-wallet-modal.component';
@@ -14,7 +13,6 @@ import {StackComponent} from '../shared/components/stack.component';
   imports: [
     DataView,
     Card,
-    Divider,
     RouterLink,
     Button,
     NewWalletModalComponent,
@@ -24,7 +22,7 @@ import {StackComponent} from '../shared/components/stack.component';
   template: `
     <div class="home-content-wrapper">
       <app-loader [isLoading]="!grantedWallets.hasValue() && grantedWallets.isLoading()">
-        <p-card header="My Wallets" styleClass="full-height-card" class="wallets-card h-full">
+        <p-card header="My Wallets" class="full-height-card wallets-card h-full">
           <div class="scrollable-list-wrapper">
             @if (grantedWallets.hasValue()) {
               <p-data-view
@@ -45,10 +43,6 @@ import {StackComponent} from '../shared/components/stack.component';
                           </div>
                         </div>
                       </a>
-
-                      @if (!last) {
-                        <p-divider />
-                      }
                     }
                   </div>
                 </ng-template>
@@ -112,7 +106,7 @@ import {StackComponent} from '../shared/components/stack.component';
           width: 6px;
         }
         &::-webkit-scrollbar-thumb {
-          background-color: var(--surface-400);
+          background-color: var(--p-surface-400);
           border-radius: 4px;
         }
       }
@@ -126,28 +120,28 @@ import {StackComponent} from '../shared/components/stack.component';
 
       /* Optional: Shadow and color tweaks */
       button {
-        width: 3.5rem;
-        height: 3.5rem;
         border-radius: 50%;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       }
     }
 
     .wallet-card {
-      background-color: var(--p-surface-card, #1e1e1e); /* Dark card for dark theme */
+      background-color: var(--p-content-background);
+      border: 1px solid var(--p-content-border-color);
+      color: var(--p-text-color);
       border-radius: 12px;
-      transition: background 0.3s, transform 0.2s;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
       min-height: 100px;
       display: flex;
       align-items: center;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
       padding: 1.25rem;
     }
 
     .wallet-card:hover {
-      background-color: var(--p-surface-600, #2c2c2c);
+      background-color: var(--p-content-hover-background);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .wallet-card-content {
@@ -160,7 +154,7 @@ import {StackComponent} from '../shared/components/stack.component';
     .wallet-name {
       font-size: 1.3rem;
       font-weight: 600;
-      color: var(--p-text-color, #ffffff);
+      color: var(--p-text-color);
     }
 
     .emoji {
@@ -170,13 +164,12 @@ import {StackComponent} from '../shared/components/stack.component';
     .wallets-card {
       border: none;
       box-shadow: none;
-      background-color: transparent;
     }
 
     .wallet-list {
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 10px;
     }
 
     .wallet-link {
