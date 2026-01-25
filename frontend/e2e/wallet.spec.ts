@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {generateEmail, generateUsername, generateWalletName} from './utils/faker.utils';
 
-test('user should create a new wallet, navigate to details, and edit it successfully', async ({ page }) => {
+test('user should create a new wallet, navigate to details, edit and then delete it successfully', async ({ page }) => {
   // ===========================================================================
   // STEP 1: Registration (Setup)
   // ===========================================================================
@@ -106,4 +106,28 @@ test('user should create a new wallet, navigate to details, and edit it successf
 
   // Verify the new name is visible on the page
   await expect(page.getByText(updatedWalletName)).toBeVisible();
+
+  // ===========================================================================
+  // STEP 7: Delete the wallet
+  // ===========================================================================
+  // Find the "Settings" item in the menu.
+  await page.locator("[data-testid = 'wallet-delete-btn']").click();
+
+  // Check that the Edit Dialog opened and pre-filled data is correct
+  const deleteDialog = page.getByRole('dialog', { name: 'Delete Wallet Confirmation' });
+  await expect(deleteDialog).toBeVisible();
+
+  // Setup wait for DELETE request
+  const deletePromise = page.waitForResponse(resp =>
+    resp.url().includes('/wallets') && resp.request().method() === 'DELETE'
+  );
+
+  // Click Save
+  await deleteDialog.getByRole('button', { name: /Delete Wallet/i }).click();
+
+  const deleteResponse = await deletePromise;
+  expect(deleteResponse.status()).toBe(200);
+
+  // Verify Navigating to Home Page
+  await expect(page).toHaveURL('/');
 });

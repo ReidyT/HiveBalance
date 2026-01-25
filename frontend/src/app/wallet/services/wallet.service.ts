@@ -55,4 +55,12 @@ export class WalletService {
       this.grantedWallets.reload();
     }));
   }
+
+  public deleteWallet(id: string) {
+    return this.http.delete<void>(this.backendConfig.walletRoutes.deleteWallet(id))
+      .pipe(tap(() => {
+        this.setActiveWallet(null);
+        this.grantedWallets.reload();
+      }));
+  }
 }

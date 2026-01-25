@@ -41,6 +41,10 @@ class WalletRoutes {
   public patchWallet(walletId: string) {
     return `${this.walletUrl}/${walletId}`;
   }
+
+  public deleteWallet(walletId: string) {
+    return `${this.walletUrl}/${walletId}`;
+  }
 }
 
 class CurrencyRoutes {
