@@ -3,10 +3,13 @@ import {Menu} from 'primeng/menu';
 import {Badge} from 'primeng/badge';
 import {Ripple} from 'primeng/ripple';
 import {NgIf} from '@angular/common';
-import {MenuItem} from 'primeng/api';
+import {MenuItem, PrimeIcons} from 'primeng/api';
 import {WalletService} from '../../services/wallet.service';
 import {EditWalletModalComponent} from './edit-wallet-modal/edit-wallet-modal.component';
 import {WalletEditData} from './edit-wallet-modal/wallet.edit.data';
+import {DeleteWalletModalComponent} from './delete-wallet-modal/delete-wallet-modal.component';
+import {WalletDeleteData} from './delete-wallet-modal/wallet.delete.data';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-wallet-details-menu',
@@ -16,6 +19,7 @@ import {WalletEditData} from './edit-wallet-modal/wallet.edit.data';
     Ripple,
     NgIf,
     EditWalletModalComponent,
+    DeleteWalletModalComponent,
   ],
   template: `
   <p-menu [model]="items" class="flex justify-center" styleClass="w-full md:w-60">
@@ -44,13 +48,17 @@ import {WalletEditData} from './edit-wallet-modal/wallet.edit.data';
   </p-menu>
 
   <app-edit-wallet-modal [(visible)]="showEditWallet" [walletData]="walletEditData()" />
+  <app-delete-wallet-modal [(visible)]="showDeleteWallet" [walletData]="walletDeleteData()" (walletDeleted)="handleWalletDeleted($event)" />
   `,
   styles: ``
 })
 export class WalletDetailsMenuComponent {
   private walletService = inject(WalletService);
+  private router = inject(Router);
+
   protected walletDetails = this.walletService.walletDetails;
   protected showEditWallet = false;
+  protected showDeleteWallet = false;
   protected walletEditData: Signal<WalletEditData|null> = computed(() => {
     const wallet = this.walletDetails.value();
 
@@ -62,6 +70,18 @@ export class WalletDetailsMenuComponent {
       id: wallet.id,
       name: wallet.name,
       currencyCode: wallet.currency.code,
+    };
+  });
+  protected walletDeleteData: Signal<WalletDeleteData|null> = computed(() => {
+    const wallet = this.walletDetails.value();
+
+    if (!wallet) {
+      return null;
+    }
+
+    return {
+      id: wallet.id,
+      name: wallet.name,
     };
   });
   protected items: MenuItem[] = [
@@ -87,7 +107,21 @@ export class WalletDetailsMenuComponent {
             },
             testId: 'wallet-edit-settings'
           },
+          {
+            label: 'Delete',
+            icon: PrimeIcons.TRASH,
+            command: () => {
+              this.showDeleteWallet = true;
+            },
+            testId: 'wallet-delete-btn'
+          },
         ]
       },
     ];
+
+  protected async handleWalletDeleted(deleted: boolean) {
+    if (deleted) {
+      await this.router.navigate(['/']);
+    }
+  }
 }

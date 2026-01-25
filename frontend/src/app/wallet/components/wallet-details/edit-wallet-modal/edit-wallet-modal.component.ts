@@ -136,7 +136,7 @@ export class EditWalletModalComponent {
       currencyCode: form.currency.value
     }).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Wallet updated' });
+        this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Wallet has been updated.' });
         this.walletUpdated.emit(original.id);
         this.close();
       },
